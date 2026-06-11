@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مدرسة الشام الدولية الافتراضية — تسجيل الطلاب</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:linear-gradient(135deg,#1a1060 0%,#2d1b8e 25%,#1e3a8a 55%,#1e4fa8 80%,#0f6e8a 100%);background-attachment:fixed;color:#1a1a1a;direction:rtl;min-height:100vh;padding:1.5rem 1rem;position:relative;overflow-x:hidden}
+  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(167,139,250,0.18) 0%,transparent 55%),radial-gradient(ellipse at 80% 80%,rgba(56,189,248,0.15) 0%,transparent 55%);pointer-events:none;z-index:0}
+  .wrap{max-width:680px;margin:0 auto;position:relative;z-index:1}
+  .header{text-align:center;padding:1.5rem 1rem;background:rgba(255,255,255,0.97);border-radius:18px;border:1px solid rgba(255,255,255,0.6);margin-bottom:1.25rem;box-shadow:0 4px 24px rgba(0,0,0,0.18)}
+  .header h1{font-size:22px;font-weight:600;color:#1a1a1a;margin-bottom:5px}
+  .header p{font-size:14px;color:#666}
+  .card{background:rgba(255,255,255,0.97);border-radius:14px;border:1px solid rgba(255,255,255,0.5);padding:1.25rem;margin-bottom:1rem;box-shadow:0 4px 20px rgba(0,0,0,0.14)}
+  .sec{font-size:13px;font-weight:600;color:#555;margin:0 0 14px;padding-bottom:8px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:6px}
+  .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+  .g1{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:12px}
+  .f{display:flex;flex-direction:column;gap:5px}
+  label{font-size:13px;color:#555;font-weight:500}
+  input,select,textarea{font-family:'Segoe UI',Tahoma,Arial,sans-serif;font-size:14px;color:#1a1a1a;background:#fff;border:1px solid #ddd;border-radius:8px;padding:9px 11px;width:100%;direction:rtl;transition:border-color 0.15s}
+  input:focus,select:focus,textarea:focus{outline:none;border-color:#534AB7;box-shadow:0 0 0 3px rgba(83,74,183,0.1)}
+  textarea{resize:vertical;min-height:80px}
+  .pw{display:flex;gap:7px}
+  .pw select{width:135px;flex-shrink:0}
+  .pw input{flex:1}
+  .req{color:#D85A30}
+  .btn{width:100%;padding:11px;background:#534AB7;border:none;border-radius:9px;font-size:15px;font-weight:600;color:#fff;cursor:pointer;transition:background 0.15s;margin-top:4px;font-family:'Segoe UI',Tahoma,Arial,sans-serif}
+  .btn:hover{background:#3C3489}
+  .btn:active{transform:scale(0.99)}
+  .btn-outline{background:#fff;border:1px solid #ddd;color:#1a1a1a;font-weight:500}
+  .btn-outline:hover{background:#f5f5f0}
+  .btn-green{background:#3B6D11;color:#fff}
+  .btn-green:hover{background:#27500A}
+  .btn-red{background:#fff;border:1px solid #A32D2D;color:#791F1F;font-weight:500}
+  .btn-red:hover{background:#FCEBEB}
+  .btn-row{display:flex;gap:10px;margin-top:6px}
+  .btn-row .btn{margin-top:0}
+  .success{background:#eaf3de;border:1px solid #639922;border-radius:10px;padding:16px;text-align:center;margin-top:12px}
+  .success-icon{font-size:32px;margin-bottom:6px}
+  .success p{color:#27500A;font-size:16px;font-weight:600}
+  .success small{color:#3B6D11;font-size:13px}
+  .err-box{background:#FCEBEB;border:1px solid #A32D2D;border-radius:8px;padding:10px 14px;font-size:13px;color:#791F1F;margin-top:8px;text-align:center}
+  .admin-bar{display:flex;align-items:center;justify-content:space-between;background:#eaf3de;border-radius:10px;padding:10px 16px;margin-bottom:1rem;border:1px solid #639922;flex-wrap:wrap;gap:8px}
+  .admin-bar span{font-size:13px;color:#27500A;font-weight:500}
+  .hidden{display:none}
+  .loader{text-align:center;padding:20px;color:#888;font-size:14px}
+  .stat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+  .stat{background:#f5f5f0;border-radius:10px;padding:14px;text-align:center}
+  .stat-n{font-size:26px;font-weight:700;color:#534AB7}
+  .stat-l{font-size:12px;color:#666;margin-top:3px}
+  .tbl-wrap{overflow-x:auto;margin-top:12px}
+  table{width:100%;border-collapse:collapse;font-size:12px;direction:rtl;min-width:600px}
+  thead tr{background:#f5f5f0}
+  th{padding:9px 7px;font-weight:600;color:#555;border-bottom:1px solid #e5e5e0;text-align:right;white-space:nowrap}
+  td{padding:8px 7px;border-bottom:1px solid #f0f0f0}
+  tr:last-child td{border-bottom:none}
+  tr:hover td{background:#fafaf8}
+  .badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;background:#eaf3de;color:#3B6D11}
+  .toggle-admin{text-align:center;margin-top:12px}
+  .toggle-admin button{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);font-size:13px;color:rgba(255,255,255,0.85);cursor:pointer;padding:7px 18px;border-radius:20px;font-family:'Segoe UI',Tahoma,Arial,sans-serif;transition:background 0.15s}
+  .toggle-admin button:hover{background:rgba(255,255,255,0.25);color:#fff}
+  @media(max-width:500px){.g2{grid-template-columns:1fr}.pw select{width:110px}}
+  .particle{position:fixed;border-radius:50%;background:rgba(255,255,255,0.15);animation:float linear infinite;pointer-events:none;z-index:0}
+  @keyframes float{0%{transform:translateY(100vh) rotate(0deg);opacity:0}10%{opacity:1}90%{opacity:0.5}100%{transform:translateY(-100px) rotate(720deg);opacity:0}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+
+  <div class="header">
+    <div style="font-size:32px;margin-bottom:8px">🏫</div>
+    <h1>مدرسة الشام الدولية الافتراضية</h1>
+    <p>نموذج تسجيل بيانات الطالب للتواصل وإيصال الإشعارات والكتب</p>
+  </div>
+
+  <!-- Admin bar (shown after login) -->
+  <div id="adminBar" class="admin-bar hidden">
+    <span>✅ آدمن: <strong id="adminEmailDisplay"></strong></span>
+    <button class="btn btn-red" style="width:auto;padding:7px 16px;font-size:13px" onclick="doLogout()">تسجيل خروج</button>
+  </div>
+
+  <!-- Login card (hidden by default) -->
+  <div id="loginSection" class="card hidden">
+    <p class="sec">🔒 دخول الآدمن</p>
+    <div class="g1">
+      <div class="f">
+        <label>البريد الإلكتروني</label>
+        <input type="email" id="adminEmail" placeholder="sdsamer@gmail.com" value="sdsamer@gmail.com">
+      </div>
+      <div class="f">
+        <label>كلمة السر</label>
+        <input type="password" id="adminPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+    </div>
+    <button class="btn" onclick="doLogin()">🔑 تسجيل الدخول</button>
+    <div id="loginErr"></div>
+  </div>
+
+  <!-- Registration form -->
+  <div id="regForm">
+    <div class="card">
+      <p class="sec">👤 بيانات الطالب الشخصية</p>
+      <div class="g2">
+        <div class="f"><label>اسم الطالب <span class="req">*</span></label><input type="text" id="fname" placeholder="الاسم الأول"></div>
+        <div class="f"><label>الكنية <span class="req">*</span></label><input type="text" id="lname" placeholder="اللقب العائلي"></div>
+      </div>
+      <div class="g2">
+        <div class="f"><label>اسم الأب <span class="req">*</span></label><input type="text" id="father" placeholder="اسم الأب"></div>
+        <div class="f"><label>اسم الجد (والد الأب) <span class="req">*</span></label><input type="text" id="grandfather" placeholder="اسم الجد"></div>
+      </div>
+      <div class="g2">
+        <div class="f"><label>اسم الأم <span class="req">*</span></label><input type="text" id="mother" placeholder="اسم الأم"></div>
+        <div class="f"><label>كنية الأم <span class="req">*</span></label><input type="text" id="motherlname" placeholder="لقب الأم"></div>
+      </div>
+      <div class="g1">
+        <div class="f">
+          <label>الصف الدراسي <span class="req">*</span></label>
+          <select id="grade">
+            <option value="">— اختر الصف —</option>
+            <optgroup label="ما قبل المدرسة">
+              <option value="تحضيري">التحضيري (KG)</option>
+            </optgroup>
+            <optgroup label="المرحلة الابتدائية">
+              <option>الأول الابتدائي</option>
+              <option>الثاني الابتدائي</option>
+              <option>الثالث الابتدائي</option>
+              <option>الرابع الابتدائي</option>
+              <option>الخامس الابتدائي</option>
+              <option>السادس الابتدائي</option>
+            </optgroup>
+            <optgroup label="المرحلة الإعدادية">
+              <option>الأول الإعدادي</option>
+              <option>الثاني الإعدادي</option>
+              <option>الثالث الإعدادي</option>
+            </optgroup>
+            <optgroup label="المرحلة الثانوية">
+              <option>الأول الثانوي</option>
+              <option>الثاني الثانوي</option>
+              <option>الثالث الثانوي</option>
+            </optgroup>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="sec">📍 بيانات الإقامة</p>
+      <div class="g2">
+        <div class="f">
+          <label>الدولة <span class="req">*</span></label>
+          <select id="country" onchange="updateProvinces()">
+            <option value="">— اختر الدولة —</option>
+            <option value="syria">سوريا</option>
+            <option value="saudi">السعودية</option>
+            <option value="uae">الإمارات</option>
+            <option value="qatar">قطر</option>
+          </select>
+        </div>
+        <div class="f">
+          <label>المحافظة / المنطقة <span class="req">*</span></label>
+          <select id="province"><option value="">— اختر المحافظة —</option></select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="sec">📱 بيانات التواصل</p>
+      <div class="g1">
+        <div class="f">
+          <label>رقم الواتساب <span class="req">*</span></label>
+          <div class="pw">
+            <select id="wacode">
+              <option value="+963">🇸🇾 +963</option>
+              <option value="+966">🇸🇦 +966</option>
+              <option value="+971">🇦🇪 +971</option>
+              <option value="+974">🇶🇦 +974</option>
+            </select>
+            <input type="tel" id="whatsapp" placeholder="رقم الواتساب">
+          </div>
+        </div>
+        <div class="f">
+          <label>رقم الموبايل للتواصل <span class="req">*</span></label>
+          <div class="pw">
+            <select id="mobcode">
+              <option value="+963">🇸🇾 +963</option>
+              <option value="+966">🇸🇦 +966</option>
+              <option value="+971">🇦🇪 +971</option>
+              <option value="+974">🇶🇦 +974</option>
+            </select>
+            <input type="tel" id="mobile" placeholder="رقم الموبايل">
+          </div>
+        </div>
+        <div class="f">
+          <label>ملاحظات إضافية</label>
+          <textarea id="notes" placeholder="أي معلومات إضافية تودّ إضافتها..."></textarea>
+        </div>
+      </div>
+      <button class="btn" onclick="submitForm()">📤 تسجيل البيانات</button>
+      <div id="formMsg"></div>
+    </div>
+  </div>
+
+  <!-- Admin panel -->
+  <div id="adminPanel" class="hidden">
+    <div class="card">
+      <p class="sec">📊 لوحة الآدمن — سجلات الطلاب</p>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" id="totalCount">—</div><div class="stat-l">إجمالي الطلاب</div></div>
+        <div class="stat"><div class="stat-n" id="todayCount">—</div><div class="stat-l">مسجّلون اليوم</div></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-green" onclick="exportExcel()">📥 تصدير إلى Excel</button>
+        <button class="btn btn-outline" onclick="loadRecords()">🔄 تحديث</button>
+      </div>
+      <div id="recordsArea"></div>
+    </div>
+  </div>
+
+  <div class="toggle-admin" id="adminToggleBtn">
+    <button onclick="toggleLogin()">🔐 دخول الآدمن</button>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getFirestore, collection, addDoc, getDocs, query, orderBy, Timestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const cfg = {
+  apiKey: "AIzaSyAgV0C0GHdWotIW5zqQsjasiAJbWFVw8KQ",
+  authDomain: "data-student-75c1c.firebaseapp.com",
+  projectId: "data-student-75c1c",
+  storageBucket: "data-student-75c1c.firebasestorage.app",
+  messagingSenderId: "839161017280",
+  appId: "1:839161017280:web:ac1a3d6e3770d1a94b4e25"
+};
+
+const app = initializeApp(cfg);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const ADMIN_EMAIL = 'sdsamer@gmail.com';
+
+const provinces = {
+  syria: ["دمشق","ريف دمشق","حلب","حمص","حماة","اللاذقية","طرطوس","دير الزور","الرقة","الحسكة","درعا","السويداء","القنيطرة","إدلب"],
+  saudi: ["الرياض","جدة","مكة المكرمة","المدينة المنورة","الدمام","الخبر","الأحساء","تبوك","أبها","نجران","جيزان","حائل","القصيم","الجوف"],
+  uae: ["أبو ظبي","دبي","الشارقة","عجمان","رأس الخيمة","الفجيرة","أم القيوين"],
+  qatar: ["الدوحة","الريان","الوكرة","الخور","الشمال","أم صلال","الضعاين","الشحانية"]
+};
+const cnames = { syria:'سوريا', saudi:'السعودية', uae:'الإمارات', qatar:'قطر' };
+
+let allRecords = [];
+
+window.updateProvinces = function() {
+  const c = document.getElementById('country').value;
+  const sel = document.getElementById('province');
+  sel.innerHTML = '<option value="">— اختر المحافظة —</option>';
+  if (c && provinces[c]) provinces[c].forEach(p => {
+    const o = document.createElement('option'); o.value = p; o.textContent = p; sel.appendChild(o);
+  });
+};
+
+window.toggleLogin = function() {
+  document.getElementById('loginSection').classList.toggle('hidden');
+};
+
+window.doLogin = async function() {
+  const email = document.getElementById('adminEmail').value.trim();
+  const pass = document.getElementById('adminPass').value;
+  const errEl = document.getElementById('loginErr');
+  errEl.innerHTML = '';
+  if (email !== ADMIN_EMAIL) {
+    errEl.innerHTML = '<div class="err-box">هذا الحساب ليس لديه صلاحية الآدمن</div>';
+    return;
+  }
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch(e) {
+    errEl.innerHTML = '<div class="err-box">بيانات الدخول غير صحيحة، يرجى المحاولة مجدداً</div>';
+  }
+};
+
+window.doLogout = async function() { await signOut(auth); };
+
+window.loadRecords = async function() {
+  const area = document.getElementById('recordsArea');
+  area.innerHTML = '<div class="loader">⏳ جارٍ تحميل السجلات...</div>';
+  try {
+    const q = query(collection(db, 'students'), orderBy('createdAt', 'desc'));
+    const snap = await getDocs(q);
+    allRecords = [];
+    snap.forEach(d => allRecords.push({ id: d.id, ...d.data() }));
+    const today = new Date().toLocaleDateString('ar-EG');
+    const todayRecs = allRecords.filter(r => {
+      if (!r.createdAt) return false;
+      const d = r.createdAt.toDate ? r.createdAt.toDate() : new Date(r.createdAt);
+      return d.toLocaleDateString('ar-EG') === today;
+    });
+    document.getElementById('totalCount').textContent = allRecords.length;
+    document.getElementById('todayCount').textContent = todayRecs.length;
+    if (!allRecords.length) { area.innerHTML = '<div class="loader">لا توجد سجلات بعد</div>'; return; }
+    area.innerHTML = `<div class="tbl-wrap"><table>
+      <thead><tr>${['#','الاسم الكامل','الصف','الدولة','المحافظة','الواتساب','الموبايل','التاريخ'].map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+      <tbody>${allRecords.map((r,i) => {
+        const d = r.createdAt ? (r.createdAt.toDate ? r.createdAt.toDate() : new Date(r.createdAt)).toLocaleDateString('ar-EG') : '';
+        return `<tr>
+          <td style="color:#aaa">${i+1}</td>
+          <td><strong>${r.fname||''} ${r.lname||''}</strong></td>
+          <td><span class="badge">${r.grade||''}</span></td>
+          <td>${r.country||''}</td>
+          <td>${r.province||''}</td>
+          <td style="direction:ltr;text-align:right">${r.whatsapp||''}</td>
+          <td style="direction:ltr;text-align:right">${r.mobile||''}</td>
+          <td style="color:#888">${d}</td>
+        </tr>`;
+      }).join('')}</tbody>
+    </table></div>`;
+  } catch(e) {
+    area.innerHTML = `<div class="err-box">خطأ في التحميل: ${e.message}</div>`;
+  }
+};
+
+window.exportExcel = function() {
+  if (!allRecords.length) { alert('لا توجد بيانات للتصدير'); return; }
+  const rows = allRecords.map(r => ({
+    'التاريخ': r.createdAt ? (r.createdAt.toDate ? r.createdAt.toDate() : new Date(r.createdAt)).toLocaleDateString('ar-EG') : '',
+    'اسم الطالب': r.fname||'', 'الكنية': r.lname||'',
+    'اسم الأب': r.father||'', 'اسم الجد': r.grandfather||'',
+    'اسم الأم': r.mother||'', 'كنية الأم': r.motherlname||'',
+    'الصف الدراسي': r.grade||'', 'الدولة': r.country||'',
+    'المحافظة': r.province||'', 'رقم الواتساب': r.whatsapp||'',
+    'رقم الموبايل': r.mobile||'', 'ملاحظات': r.notes||''
+  }));
+  const ws = XLSX.utils.json_to_sheet(rows);
+  ws['!cols'] = Object.keys(rows[0]).map(() => ({ wch: 22 }));
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'بيانات الطلاب');
+  XLSX.writeFile(wb, `طلاب_الشام_${new Date().toISOString().slice(0,10)}.xlsx`);
+};
+
+window.submitForm = async function() {
+  const required = [
+    {id:'fname',label:'اسم الطالب'},{id:'lname',label:'الكنية'},
+    {id:'father',label:'اسم الأب'},{id:'grandfather',label:'اسم الجد'},
+    {id:'mother',label:'اسم الأم'},{id:'motherlname',label:'كنية الأم'},
+    {id:'grade',label:'الصف'},{id:'country',label:'الدولة'},
+    {id:'province',label:'المحافظة'},{id:'whatsapp',label:'رقم الواتساب'},{id:'mobile',label:'رقم الموبايل'}
+  ];
+  const missing = required.filter(f => !document.getElementById(f.id).value.trim()).map(f => f.label);
+  if (missing.length) { alert('يرجى تعبئة الحقول التالية:\n' + missing.join('، ')); return; }
+  const msgEl = document.getElementById('formMsg');
+  msgEl.innerHTML = '<div class="loader">⏳ جارٍ الحفظ...</div>';
+  try {
+    await addDoc(collection(db, 'students'), {
+      fname: document.getElementById('fname').value.trim(),
+      lname: document.getElementById('lname').value.trim(),
+      father: document.getElementById('father').value.trim(),
+      grandfather: document.getElementById('grandfather').value.trim(),
+      mother: document.getElementById('mother').value.trim(),
+      motherlname: document.getElementById('motherlname').value.trim(),
+      grade: document.getElementById('grade').value,
+      country: cnames[document.getElementById('country').value] || document.getElementById('country').value,
+      province: document.getElementById('province').value,
+      whatsapp: document.getElementById('wacode').value + document.getElementById('whatsapp').value.trim(),
+      mobile: document.getElementById('mobcode').value + document.getElementById('mobile').value.trim(),
+      notes: document.getElementById('notes').value.trim(),
+      createdAt: Timestamp.now()
+    });
+    ['fname','lname','father','grandfather','mother','motherlname','whatsapp','mobile','notes'].forEach(id => document.getElementById(id).value = '');
+    ['country','province','grade'].forEach(id => document.getElementById(id).value = '');
+    document.getElementById('wacode').value = '+963';
+    document.getElementById('mobcode').value = '+963';
+    msgEl.innerHTML = `<div class="success"><div class="success-icon">✅</div><p>تم التسجيل بنجاح!</p><small>سيتواصل معك فريق مدرسة الشام الدولية الافتراضية قريباً</small></div>`;
+    setTimeout(() => msgEl.innerHTML = '', 6000);
+  } catch(e) {
+    msgEl.innerHTML = `<div class="err-box">خطأ في الحفظ: ${e.message}</div>`;
+  }
+};
+
+onAuthStateChanged(auth, user => {
+  const isAdmin = user && user.email === ADMIN_EMAIL;
+  document.getElementById('loginSection').classList.add('hidden');
+  document.getElementById('adminBar').classList.toggle('hidden', !isAdmin);
+  document.getElementById('adminPanel').classList.toggle('hidden', !isAdmin);
+  document.getElementById('adminToggleBtn').style.display = isAdmin ? 'none' : 'block';
+  if (isAdmin) {
+    document.getElementById('adminEmailDisplay').textContent = user.email;
+    loadRecords();
+  }
+});
+</script>
+<script>
+(function(){
+  const sizes=[4,6,5,8,4,6,5,4,7,5,4,6];
+  const delays=[0,3,7,1,9,5,2,11,4,8,6,10];
+  const durations=[18,22,25,20,28,15,24,19,26,21,23,17];
+  const lefts=[5,12,20,30,42,55,63,70,78,85,92,48];
+  sizes.forEach((s,i)=>{
+    const p=document.createElement('div');
+    p.className='particle';
+    p.style.cssText='width:'+s+'px;height:'+s+'px;left:'+lefts[i]+'%;animation-duration:'+durations[i]+'s;animation-delay:'+delays[i]+'s';
+    document.body.appendChild(p);
+  });
+})();
+</script>
+</body>
+</html>
