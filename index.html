@@ -6,83 +6,181 @@
 <title>مدرسة الشام الدولية الافتراضية — تسجيل الطلاب</title>
 <style>
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:linear-gradient(135deg,#1a1060 0%,#2d1b8e 25%,#1e3a8a 55%,#1e4fa8 80%,#0f6e8a 100%);background-attachment:fixed;color:#1a1a1a;direction:rtl;min-height:100vh;padding:1.5rem 1rem;position:relative;overflow-x:hidden}
-  body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 20% 20%,rgba(167,139,250,0.18) 0%,transparent 55%),radial-gradient(ellipse at 80% 80%,rgba(56,189,248,0.15) 0%,transparent 55%);pointer-events:none;z-index:0}
-  .wrap{max-width:680px;margin:0 auto;position:relative;z-index:1}
-  .header{text-align:center;padding:1.5rem 1rem;background:rgba(255,255,255,0.97);border-radius:18px;border:1px solid rgba(255,255,255,0.6);margin-bottom:1.25rem;box-shadow:0 4px 24px rgba(0,0,0,0.18)}
-  .header h1{font-size:22px;font-weight:600;color:#1a1a1a;margin-bottom:5px}
-  .header p{font-size:14px;color:#666}
-  .card{background:rgba(255,255,255,0.97);border-radius:14px;border:1px solid rgba(255,255,255,0.5);padding:1.25rem;margin-bottom:1rem;box-shadow:0 4px 20px rgba(0,0,0,0.14)}
-  .sec{font-size:13px;font-weight:600;color:#555;margin:0 0 14px;padding-bottom:8px;border-bottom:1px solid #eee;display:flex;align-items:center;gap:6px}
+  body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;direction:rtl;min-height:100vh;padding:1.5rem 1rem;position:relative;overflow-x:hidden;color:#1a1a1a}
+
+  /* ===== خلفية جذابة: سماء + أضواء متحركة ===== */
+  .bg{position:fixed;inset:0;z-index:0;
+    background:linear-gradient(160deg,#020818 0%,#071a3e 30%,#0c2461 55%,#1a1060 75%,#2d0a4e 100%)}
+  .stars{position:fixed;inset:0;z-index:0;overflow:hidden}
+  .star{position:absolute;background:#fff;border-radius:50%;animation:twinkle ease-in-out infinite}
+  @keyframes twinkle{0%,100%{opacity:0.2;transform:scale(1)}50%{opacity:1;transform:scale(1.4)}}
+  .orb{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0;animation:orbf ease-in-out infinite}
+  .orb1{width:500px;height:500px;background:rgba(139,92,246,0.28);top:-120px;right:-150px;animation-duration:14s}
+  .orb2{width:420px;height:420px;background:rgba(59,130,246,0.22);bottom:-100px;left:-120px;animation-duration:11s;animation-delay:4s}
+  .orb3{width:300px;height:300px;background:rgba(16,185,129,0.15);top:35%;left:45%;animation-duration:9s;animation-delay:2s}
+  .orb4{width:220px;height:220px;background:rgba(245,158,11,0.12);top:60%;right:10%;animation-duration:13s;animation-delay:6s}
+  @keyframes orbf{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-40px) scale(1.1)}}
+
+  .wrap{max-width:700px;margin:0 auto;position:relative;z-index:1}
+
+  /* ===== Header ===== */
+  .header{text-align:center;padding:1.75rem 1.25rem 1.5rem;
+    background:linear-gradient(135deg,rgba(255,255,255,0.97),rgba(240,245,255,0.97));
+    border-radius:22px;border:1px solid rgba(255,255,255,0.7);
+    margin-bottom:1.25rem;box-shadow:0 8px 40px rgba(0,0,0,0.3),0 0 0 1px rgba(139,92,246,0.15)}
+  .header-logo{font-size:48px;margin-bottom:10px;filter:drop-shadow(0 2px 8px rgba(79,70,229,0.3))}
+  .header h1{font-size:23px;font-weight:800;color:#1e1b4b;margin-bottom:4px;letter-spacing:-0.3px}
+  .header h2{font-size:13px;font-weight:600;color:#6366f1;margin-bottom:8px;letter-spacing:1px;text-transform:uppercase}
+  .header-divider{width:60px;height:3px;background:linear-gradient(90deg,#6366f1,#8b5cf6);border-radius:2px;margin:8px auto;opacity:0.7}
+  .header p{font-size:13px;color:#555;margin-top:4px}
+
+  /* ===== Cards ===== */
+  .card{background:rgba(255,255,255,0.97);border-radius:18px;
+    border:1px solid rgba(255,255,255,0.6);padding:1.35rem;margin-bottom:1rem;
+    box-shadow:0 4px 28px rgba(0,0,0,0.2),0 1px 0 rgba(255,255,255,0.8) inset}
+  .sec{font-size:13px;font-weight:800;color:#4338ca;margin:0 0 14px;
+    padding-bottom:10px;border-bottom:2px solid #e0e7ff;display:flex;align-items:center;gap:8px}
+  .sec-icon{font-size:16px}
+
+  /* ===== Grid ===== */
   .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
   .g1{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:12px}
   .f{display:flex;flex-direction:column;gap:5px}
-  label{font-size:13px;color:#555;font-weight:500}
-  input,select,textarea{font-family:'Segoe UI',Tahoma,Arial,sans-serif;font-size:14px;color:#1a1a1a;background:#fff;border:1px solid #ddd;border-radius:8px;padding:9px 11px;width:100%;direction:rtl;transition:border-color 0.15s}
-  input:focus,select:focus,textarea:focus{outline:none;border-color:#534AB7;box-shadow:0 0 0 3px rgba(83,74,183,0.1)}
+  label{font-size:13px;color:#374151;font-weight:600}
+
+  /* ===== Inputs ===== */
+  input,select,textarea{
+    font-family:'Segoe UI',Tahoma,Arial,sans-serif;font-size:14px;color:#1a1a1a;
+    background:#f5f7ff;border:1.5px solid #c7d2fe;border-radius:10px;
+    padding:10px 12px;width:100%;direction:rtl;
+    transition:border-color 0.2s,box-shadow 0.2s,background 0.2s}
+  input:focus,select:focus,textarea:focus{
+    outline:none;border-color:#6366f1;
+    box-shadow:0 0 0 4px rgba(99,102,241,0.12);background:#fff}
   textarea{resize:vertical;min-height:80px}
   .pw{display:flex;gap:7px}
-  .pw select{width:135px;flex-shrink:0}
+  .pw select{width:138px;flex-shrink:0}
   .pw input{flex:1}
-  .req{color:#D85A30}
-  .btn{width:100%;padding:11px;background:#534AB7;border:none;border-radius:9px;font-size:15px;font-weight:600;color:#fff;cursor:pointer;transition:background 0.15s;margin-top:4px;font-family:'Segoe UI',Tahoma,Arial,sans-serif}
-  .btn:hover{background:#3C3489}
+  .req{color:#ef4444}
+
+  /* ===== Buttons ===== */
+  .btn{width:100%;padding:12px;
+    background:linear-gradient(135deg,#4f46e5 0%,#7c3aed 100%);
+    border:none;border-radius:11px;font-size:15px;font-weight:700;color:#fff;
+    cursor:pointer;transition:opacity 0.15s,transform 0.1s,box-shadow 0.15s;
+    margin-top:4px;font-family:'Segoe UI',Tahoma,Arial,sans-serif;
+    box-shadow:0 4px 14px rgba(79,70,229,0.4)}
+  .btn:hover{opacity:0.9;box-shadow:0 6px 20px rgba(79,70,229,0.5)}
   .btn:active{transform:scale(0.99)}
-  .btn-outline{background:#fff;border:1px solid #ddd;color:#1a1a1a;font-weight:500}
-  .btn-outline:hover{background:#f5f5f0}
-  .btn-green{background:#3B6D11;color:#fff}
-  .btn-green:hover{background:#27500A}
-  .btn-red{background:#fff;border:1px solid #A32D2D;color:#791F1F;font-weight:500}
-  .btn-red:hover{background:#FCEBEB}
+  .btn-outline{background:#fff;border:2px solid #6366f1;color:#4f46e5;font-weight:700;box-shadow:none}
+  .btn-outline:hover{background:#eef2ff;box-shadow:none}
+  .btn-green{background:linear-gradient(135deg,#059669,#047857);box-shadow:0 4px 14px rgba(5,150,105,0.35)}
+  .btn-green:hover{opacity:0.9}
+  .btn-red{background:#fff;border:1.5px solid #fca5a5;color:#b91c1c;font-weight:600;box-shadow:none}
+  .btn-red:hover{background:#fef2f2}
   .btn-row{display:flex;gap:10px;margin-top:6px}
   .btn-row .btn{margin-top:0}
-  .success{background:#eaf3de;border:1px solid #639922;border-radius:10px;padding:16px;text-align:center;margin-top:12px}
-  .success-icon{font-size:32px;margin-bottom:6px}
-  .success p{color:#27500A;font-size:16px;font-weight:600}
-  .success small{color:#3B6D11;font-size:13px}
-  .err-box{background:#FCEBEB;border:1px solid #A32D2D;border-radius:8px;padding:10px 14px;font-size:13px;color:#791F1F;margin-top:8px;text-align:center}
-  .admin-bar{display:flex;align-items:center;justify-content:space-between;background:#eaf3de;border-radius:10px;padding:10px 16px;margin-bottom:1rem;border:1px solid #639922;flex-wrap:wrap;gap:8px}
-  .admin-bar span{font-size:13px;color:#27500A;font-weight:500}
+
+  /* ===== Success ===== */
+  .success{background:linear-gradient(135deg,#d1fae5,#a7f3d0);
+    border:1px solid #6ee7b7;border-radius:14px;padding:20px;
+    text-align:center;margin-top:12px;box-shadow:0 4px 16px rgba(16,185,129,0.2)}
+  .success-icon{font-size:40px;margin-bottom:8px}
+  .success p{color:#065f46;font-size:17px;font-weight:800}
+  .success small{color:#047857;font-size:13px}
+
+  /* ===== Error ===== */
+  .err-box{background:#fef2f2;border:1px solid #fca5a5;border-radius:9px;
+    padding:10px 14px;font-size:13px;color:#b91c1c;margin-top:8px;text-align:center}
+
+  /* ===== Admin bar ===== */
+  .admin-bar{display:flex;align-items:center;justify-content:space-between;
+    background:rgba(236,253,245,0.96);border-radius:13px;padding:10px 16px;
+    margin-bottom:1rem;border:1px solid #6ee7b7;flex-wrap:wrap;gap:8px}
+  .admin-bar span{font-size:13px;color:#065f46;font-weight:700}
   .hidden{display:none}
   .loader{text-align:center;padding:20px;color:#888;font-size:14px}
+
+  /* ===== Stats ===== */
   .stat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
-  .stat{background:#f5f5f0;border-radius:10px;padding:14px;text-align:center}
-  .stat-n{font-size:26px;font-weight:700;color:#534AB7}
-  .stat-l{font-size:12px;color:#666;margin-top:3px}
-  .tbl-wrap{overflow-x:auto;margin-top:12px}
-  table{width:100%;border-collapse:collapse;font-size:12px;direction:rtl;min-width:600px}
-  thead tr{background:#f5f5f0}
-  th{padding:9px 7px;font-weight:600;color:#555;border-bottom:1px solid #e5e5e0;text-align:right;white-space:nowrap}
-  td{padding:8px 7px;border-bottom:1px solid #f0f0f0}
+  .stat{background:linear-gradient(135deg,#ede9fe,#e0e7ff);border-radius:13px;padding:16px;text-align:center;border:1px solid #c4b5fd}
+  .stat-n{font-size:30px;font-weight:900;color:#4f46e5}
+  .stat-l{font-size:12px;color:#6366f1;margin-top:4px;font-weight:600}
+
+  /* ===== Table ===== */
+  .tbl-wrap{overflow-x:auto;margin-top:12px;border-radius:10px;border:1px solid #e0e7ff}
+  table{width:100%;border-collapse:collapse;font-size:12px;direction:rtl;min-width:620px}
+  thead tr{background:linear-gradient(90deg,#eef2ff,#e0e7ff)}
+  th{padding:10px 8px;font-weight:800;color:#3730a3;border-bottom:2px solid #c7d2fe;text-align:right;white-space:nowrap}
+  td{padding:8px 8px;border-bottom:1px solid #f0f0ff}
   tr:last-child td{border-bottom:none}
-  tr:hover td{background:#fafaf8}
-  .badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;background:#eaf3de;color:#3B6D11}
-  .toggle-admin{text-align:center;margin-top:12px}
-  .toggle-admin button{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.35);font-size:13px;color:rgba(255,255,255,0.85);cursor:pointer;padding:7px 18px;border-radius:20px;font-family:'Segoe UI',Tahoma,Arial,sans-serif;transition:background 0.15s}
-  .toggle-admin button:hover{background:rgba(255,255,255,0.25);color:#fff}
+  tr:hover td{background:#f5f3ff}
+  .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;background:#ede9fe;color:#5b21b6}
+
+  /* ===== Contact box ===== */
+  .contact-box{
+    background:linear-gradient(135deg,rgba(255,255,255,0.97),rgba(240,245,255,0.97));
+    border-radius:18px;padding:1.25rem 1.5rem;margin-bottom:1rem;
+    border:1px solid rgba(255,255,255,0.5);text-align:center;
+    box-shadow:0 4px 28px rgba(0,0,0,0.2)}
+  .contact-box .contact-title{font-size:14px;color:#374151;font-weight:700;margin-bottom:4px}
+  .contact-box .contact-name{font-size:17px;color:#1e1b4b;font-weight:800;margin-bottom:12px}
+  .wa-btn{display:inline-flex;align-items:center;gap:10px;
+    background:linear-gradient(135deg,#25d366,#128c7e);
+    color:#fff;text-decoration:none;font-weight:700;font-size:15px;
+    padding:12px 26px;border-radius:50px;
+    box-shadow:0 4px 18px rgba(37,211,102,0.4);
+    transition:opacity 0.15s,transform 0.1s;direction:ltr}
+  .wa-btn:hover{opacity:0.92;transform:translateY(-2px);box-shadow:0 6px 24px rgba(37,211,102,0.5)}
+  .wa-btn:active{transform:scale(0.98)}
+  .wa-icon{font-size:22px}
+  .contact-box small{display:block;font-size:12px;color:#6b7280;margin-top:10px}
+
+  /* ===== Toggle admin ===== */
+  .toggle-admin{text-align:center;margin-top:14px;margin-bottom:10px}
+  .toggle-admin button{
+    background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.25);
+    font-size:13px;color:rgba(255,255,255,0.75);cursor:pointer;
+    padding:8px 22px;border-radius:22px;
+    font-family:'Segoe UI',Tahoma,Arial,sans-serif;transition:all 0.2s;
+    backdrop-filter:blur(4px)}
+  .toggle-admin button:hover{background:rgba(255,255,255,0.2);color:#fff;border-color:rgba(255,255,255,0.4)}
+
   @media(max-width:500px){.g2{grid-template-columns:1fr}.pw select{width:110px}}
-  .particle{position:fixed;border-radius:50%;background:rgba(255,255,255,0.15);animation:float linear infinite;pointer-events:none;z-index:0}
-  @keyframes float{0%{transform:translateY(100vh) rotate(0deg);opacity:0}10%{opacity:1}90%{opacity:0.5}100%{transform:translateY(-100px) rotate(720deg);opacity:0}}
+
+  /* ===== Floating particles ===== */
+  .particle{position:fixed;border-radius:50%;pointer-events:none;z-index:0;animation:pfloat linear infinite}
+  @keyframes pfloat{0%{transform:translateY(100vh) rotate(0deg);opacity:0}8%{opacity:0.7}90%{opacity:0.3}100%{transform:translateY(-150px) rotate(720deg);opacity:0}}
 </style>
 </head>
 <body>
+<div class="bg"></div>
+<div class="stars" id="starsContainer"></div>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
+<div class="orb orb4"></div>
+
 <div class="wrap" id="app">
 
+  <!-- ===== Header ===== -->
   <div class="header">
-    <div style="font-size:32px;margin-bottom:8px">🏫</div>
+    <div class="header-logo">🏫</div>
     <h1>مدرسة الشام الدولية الافتراضية</h1>
+    <h2>Al-Sham International Virtual School</h2>
+    <div class="header-divider"></div>
     <p>نموذج تسجيل بيانات الطالب للتواصل وإيصال الإشعارات والكتب</p>
   </div>
 
-  <!-- Admin bar (shown after login) -->
+  <!-- Admin bar -->
   <div id="adminBar" class="admin-bar hidden">
     <span>✅ آدمن: <strong id="adminEmailDisplay"></strong></span>
     <button class="btn btn-red" style="width:auto;padding:7px 16px;font-size:13px" onclick="doLogout()">تسجيل خروج</button>
   </div>
 
-  <!-- Login card (hidden by default) -->
+  <!-- Login -->
   <div id="loginSection" class="card hidden">
-    <p class="sec">🔒 دخول الآدمن</p>
+    <p class="sec"><span class="sec-icon">🔒</span> دخول الآدمن</p>
     <div class="g1">
       <div class="f">
         <label>البريد الإلكتروني</label>
@@ -97,10 +195,12 @@
     <div id="loginErr"></div>
   </div>
 
-  <!-- Registration form -->
+  <!-- ===== Registration Form ===== -->
   <div id="regForm">
+
+    <!-- بيانات شخصية -->
     <div class="card">
-      <p class="sec">👤 بيانات الطالب الشخصية</p>
+      <p class="sec"><span class="sec-icon">👤</span> بيانات الطالب الشخصية</p>
       <div class="g2">
         <div class="f"><label>اسم الطالب <span class="req">*</span></label><input type="text" id="fname" placeholder="الاسم الأول"></div>
         <div class="f"><label>الكنية <span class="req">*</span></label><input type="text" id="lname" placeholder="اللقب العائلي"></div>
@@ -109,13 +209,17 @@
         <div class="f"><label>اسم الأب <span class="req">*</span></label><input type="text" id="father" placeholder="اسم الأب"></div>
         <div class="f"><label>اسم الجد (والد الأب) <span class="req">*</span></label><input type="text" id="grandfather" placeholder="اسم الجد"></div>
       </div>
-      <div class="g2">
-        <div class="f"><label>اسم الأم <span class="req">*</span></label><input type="text" id="mother" placeholder="اسم الأم"></div>
-        <div class="f"><label>كنية الأم <span class="req">*</span></label><input type="text" id="motherlname" placeholder="لقب الأم"></div>
-      </div>
+      <!-- 1: الأم مدمج في حقل واحد -->
       <div class="g1">
         <div class="f">
-          <label>الصف الدراسي <span class="req">*</span></label>
+          <label>اسم الأم الكامل (الاسم والكنية) <span class="req">*</span></label>
+          <input type="text" id="mother" placeholder="مثال: فاطمة الأحمد">
+        </div>
+      </div>
+      <!-- 2+3: الصف مع تسمية العام الدراسي -->
+      <div class="g1">
+        <div class="f">
+          <label>صف الطالب خلال العام الدراسي 2025 – 2026 <span class="req">*</span></label>
           <select id="grade">
             <option value="">— اختر الصف —</option>
             <optgroup label="ما قبل المدرسة">
@@ -129,23 +233,29 @@
               <option>الخامس الابتدائي</option>
               <option>السادس الابتدائي</option>
             </optgroup>
-            <optgroup label="المرحلة الإعدادية">
+            <optgroup label="المرحلة الإعدادية / المتوسطة">
               <option>الأول الإعدادي</option>
               <option>الثاني الإعدادي</option>
               <option>الثالث الإعدادي</option>
             </optgroup>
-            <optgroup label="المرحلة الثانوية">
+            <optgroup label="الثانوية — العلمي">
               <option>الأول الثانوي</option>
               <option>الثاني الثانوي</option>
               <option>الثالث الثانوي</option>
+            </optgroup>
+            <optgroup label="الثانوية — الأدبي">
+              <option>الأول الثانوي الأدبي</option>
+              <option>الثاني الثانوي الأدبي</option>
+              <option>الثالث الثانوي الأدبي</option>
             </optgroup>
           </select>
         </div>
       </div>
     </div>
 
+    <!-- 4: العنوان بالتفصيل -->
     <div class="card">
-      <p class="sec">📍 بيانات الإقامة</p>
+      <p class="sec"><span class="sec-icon">📍</span> العنوان بالتفصيل</p>
       <div class="g2">
         <div class="f">
           <label>الدولة <span class="req">*</span></label>
@@ -162,22 +272,23 @@
           <select id="province"><option value="">— اختر المحافظة —</option></select>
         </div>
       </div>
+      <div class="g2">
+        <div class="f"><label>المدينة / الحي <span class="req">*</span></label><input type="text" id="city" placeholder="مثال: المزة، حي النزهة..."></div>
+        <div class="f"><label>الشارع</label><input type="text" id="street" placeholder="مثال: شارع الجلاء..."></div>
+      </div>
+      <div class="g1">
+        <div class="f"><label>تفاصيل إضافية</label><input type="text" id="addressDetail" placeholder="مثال: بناء رقم 5، طابق 3، بجانب مسجد..."></div>
+      </div>
     </div>
 
+    <!-- التواصل -->
     <div class="card">
-      <p class="sec">📱 بيانات التواصل</p>
+      <p class="sec"><span class="sec-icon">📱</span> بيانات التواصل</p>
       <div class="g1">
+        <!-- 5: رقم واتساب بدون مفتاح دولة -->
         <div class="f">
-          <label>رقم الواتساب <span class="req">*</span></label>
-          <div class="pw">
-            <select id="wacode">
-              <option value="+963">🇸🇾 +963</option>
-              <option value="+966">🇸🇦 +966</option>
-              <option value="+971">🇦🇪 +971</option>
-              <option value="+974">🇶🇦 +974</option>
-            </select>
-            <input type="tel" id="whatsapp" placeholder="رقم الواتساب">
-          </div>
+          <label>رقم الواتساب (مع رمز الدولة) <span class="req">*</span></label>
+          <input type="tel" id="whatsapp" placeholder="مثال: 963994000000+" style="direction:ltr;text-align:right">
         </div>
         <div class="f">
           <label>رقم الموبايل للتواصل <span class="req">*</span></label>
@@ -191,20 +302,29 @@
             <input type="tel" id="mobile" placeholder="رقم الموبايل">
           </div>
         </div>
-        <div class="f">
-          <label>ملاحظات إضافية</label>
-          <textarea id="notes" placeholder="أي معلومات إضافية تودّ إضافتها..."></textarea>
-        </div>
+        <div class="f"><label>ملاحظات إضافية</label><textarea id="notes" placeholder="أي معلومات إضافية تودّ إضافتها..."></textarea></div>
       </div>
       <button class="btn" onclick="submitForm()">📤 تسجيل البيانات</button>
       <div id="formMsg"></div>
     </div>
-  </div>
 
-  <!-- Admin panel -->
+    <!-- 6: بطاقة الآنسة بيداء مع زر واتساب مباشر -->
+    <div class="contact-box">
+      <p class="contact-title">📞 للاستفسار والتواصل</p>
+      <p class="contact-name">الآنسة بيداء الصفدي</p>
+      <a class="wa-btn" href="https://wa.me/963994861861" target="_blank" rel="noopener">
+        <span class="wa-icon">💬</span>
+        تواصل عبر واتساب
+      </a>
+      <small>+963 994 861 861 — يسعدنا الإجابة على جميع استفساراتكم</small>
+    </div>
+
+  </div><!-- end regForm -->
+
+  <!-- ===== Admin Panel ===== -->
   <div id="adminPanel" class="hidden">
     <div class="card">
-      <p class="sec">📊 لوحة الآدمن — سجلات الطلاب</p>
+      <p class="sec"><span class="sec-icon">📊</span> لوحة الآدمن — سجلات الطلاب</p>
       <div class="stat-row">
         <div class="stat"><div class="stat-n" id="totalCount">—</div><div class="stat-l">إجمالي الطلاب</div></div>
         <div class="stat"><div class="stat-n" id="todayCount">—</div><div class="stat-l">مسجّلون اليوم</div></div>
@@ -221,7 +341,7 @@
     <button onclick="toggleLogin()">🔐 دخول الآدمن</button>
   </div>
 
-</div>
+</div><!-- end wrap -->
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script type="module">
@@ -230,177 +350,189 @@ import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from
 import { getFirestore, collection, addDoc, getDocs, query, orderBy, Timestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const cfg = {
-  apiKey: "AIzaSyAgV0C0GHdWotIW5zqQsjasiAJbWFVw8KQ",
-  authDomain: "data-student-75c1c.firebaseapp.com",
-  projectId: "data-student-75c1c",
-  storageBucket: "data-student-75c1c.firebasestorage.app",
-  messagingSenderId: "839161017280",
-  appId: "1:839161017280:web:ac1a3d6e3770d1a94b4e25"
+  apiKey:"AIzaSyAgV0C0GHdWotIW5zqQsjasiAJbWFVw8KQ",
+  authDomain:"data-student-75c1c.firebaseapp.com",
+  projectId:"data-student-75c1c",
+  storageBucket:"data-student-75c1c.firebasestorage.app",
+  messagingSenderId:"839161017280",
+  appId:"1:839161017280:web:ac1a3d6e3770d1a94b4e25"
 };
-
 const app = initializeApp(cfg);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const ADMIN_EMAIL = 'sdsamer@gmail.com';
 
 const provinces = {
-  syria: ["دمشق","ريف دمشق","حلب","حمص","حماة","اللاذقية","طرطوس","دير الزور","الرقة","الحسكة","درعا","السويداء","القنيطرة","إدلب"],
-  saudi: ["الرياض","جدة","مكة المكرمة","المدينة المنورة","الدمام","الخبر","الأحساء","تبوك","أبها","نجران","جيزان","حائل","القصيم","الجوف"],
-  uae: ["أبو ظبي","دبي","الشارقة","عجمان","رأس الخيمة","الفجيرة","أم القيوين"],
-  qatar: ["الدوحة","الريان","الوكرة","الخور","الشمال","أم صلال","الضعاين","الشحانية"]
+  syria:["دمشق","ريف دمشق","حلب","حمص","حماة","اللاذقية","طرطوس","دير الزور","الرقة","الحسكة","درعا","السويداء","القنيطرة","إدلب"],
+  saudi:["الرياض","جدة","مكة المكرمة","المدينة المنورة","الدمام","الخبر","الأحساء","تبوك","أبها","نجران","جيزان","حائل","القصيم","الجوف"],
+  uae:["أبو ظبي","دبي","الشارقة","عجمان","رأس الخيمة","الفجيرة","أم القيوين"],
+  qatar:["الدوحة","الريان","الوكرة","الخور","الشمال","أم صلال","الضعاين","الشحانية"]
 };
-const cnames = { syria:'سوريا', saudi:'السعودية', uae:'الإمارات', qatar:'قطر' };
-
+const cnames = {syria:'سوريا',saudi:'السعودية',uae:'الإمارات',qatar:'قطر'};
 let allRecords = [];
 
-window.updateProvinces = function() {
+window.updateProvinces = function(){
   const c = document.getElementById('country').value;
   const sel = document.getElementById('province');
   sel.innerHTML = '<option value="">— اختر المحافظة —</option>';
-  if (c && provinces[c]) provinces[c].forEach(p => {
-    const o = document.createElement('option'); o.value = p; o.textContent = p; sel.appendChild(o);
+  if(c && provinces[c]) provinces[c].forEach(p=>{
+    const o=document.createElement('option'); o.value=p; o.textContent=p; sel.appendChild(o);
   });
 };
 
-window.toggleLogin = function() {
+window.toggleLogin = function(){
   document.getElementById('loginSection').classList.toggle('hidden');
 };
 
-window.doLogin = async function() {
+window.doLogin = async function(){
   const email = document.getElementById('adminEmail').value.trim();
   const pass = document.getElementById('adminPass').value;
   const errEl = document.getElementById('loginErr');
-  errEl.innerHTML = '';
-  if (email !== ADMIN_EMAIL) {
-    errEl.innerHTML = '<div class="err-box">هذا الحساب ليس لديه صلاحية الآدمن</div>';
-    return;
-  }
-  try {
+  errEl.innerHTML='';
+  if(email !== ADMIN_EMAIL){errEl.innerHTML='<div class="err-box">هذا الحساب ليس لديه صلاحية الآدمن</div>';return;}
+  try{
     await signInWithEmailAndPassword(auth, email, pass);
-  } catch(e) {
-    errEl.innerHTML = '<div class="err-box">بيانات الدخول غير صحيحة، يرجى المحاولة مجدداً</div>';
+  }catch(e){
+    errEl.innerHTML='<div class="err-box">بيانات الدخول غير صحيحة، يرجى المحاولة مجدداً</div>';
   }
 };
 
-window.doLogout = async function() { await signOut(auth); };
+window.doLogout = async function(){ await signOut(auth); };
 
-window.loadRecords = async function() {
+window.loadRecords = async function(){
   const area = document.getElementById('recordsArea');
-  area.innerHTML = '<div class="loader">⏳ جارٍ تحميل السجلات...</div>';
-  try {
-    const q = query(collection(db, 'students'), orderBy('createdAt', 'desc'));
+  area.innerHTML='<div class="loader">⏳ جارٍ تحميل السجلات...</div>';
+  try{
+    const q = query(collection(db,'students'), orderBy('createdAt','desc'));
     const snap = await getDocs(q);
-    allRecords = [];
-    snap.forEach(d => allRecords.push({ id: d.id, ...d.data() }));
+    allRecords=[];
+    snap.forEach(d=>allRecords.push({id:d.id,...d.data()}));
     const today = new Date().toLocaleDateString('ar-EG');
-    const todayRecs = allRecords.filter(r => {
-      if (!r.createdAt) return false;
+    const todayRecs = allRecords.filter(r=>{
+      if(!r.createdAt) return false;
       const d = r.createdAt.toDate ? r.createdAt.toDate() : new Date(r.createdAt);
-      return d.toLocaleDateString('ar-EG') === today;
+      return d.toLocaleDateString('ar-EG')===today;
     });
     document.getElementById('totalCount').textContent = allRecords.length;
     document.getElementById('todayCount').textContent = todayRecs.length;
-    if (!allRecords.length) { area.innerHTML = '<div class="loader">لا توجد سجلات بعد</div>'; return; }
-    area.innerHTML = `<div class="tbl-wrap"><table>
-      <thead><tr>${['#','الاسم الكامل','الصف','الدولة','المحافظة','الواتساب','الموبايل','التاريخ'].map(h=>`<th>${h}</th>`).join('')}</tr></thead>
-      <tbody>${allRecords.map((r,i) => {
-        const d = r.createdAt ? (r.createdAt.toDate ? r.createdAt.toDate() : new Date(r.createdAt)).toLocaleDateString('ar-EG') : '';
+    if(!allRecords.length){area.innerHTML='<div class="loader">لا توجد سجلات بعد</div>';return;}
+    area.innerHTML=`<div class="tbl-wrap"><table>
+      <thead><tr>${['#','الاسم الكامل','الصف','الدولة','المحافظة','المدينة','الواتساب','الموبايل','التاريخ'].map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+      <tbody>${allRecords.map((r,i)=>{
+        const d=r.createdAt?(r.createdAt.toDate?r.createdAt.toDate():new Date(r.createdAt)).toLocaleDateString('ar-EG'):'';
         return `<tr>
           <td style="color:#aaa">${i+1}</td>
           <td><strong>${r.fname||''} ${r.lname||''}</strong></td>
           <td><span class="badge">${r.grade||''}</span></td>
           <td>${r.country||''}</td>
           <td>${r.province||''}</td>
+          <td>${r.city||''}</td>
           <td style="direction:ltr;text-align:right">${r.whatsapp||''}</td>
           <td style="direction:ltr;text-align:right">${r.mobile||''}</td>
           <td style="color:#888">${d}</td>
         </tr>`;
       }).join('')}</tbody>
     </table></div>`;
-  } catch(e) {
-    area.innerHTML = `<div class="err-box">خطأ في التحميل: ${e.message}</div>`;
+  }catch(e){
+    area.innerHTML=`<div class="err-box">خطأ في التحميل: ${e.message}</div>`;
   }
 };
 
-window.exportExcel = function() {
-  if (!allRecords.length) { alert('لا توجد بيانات للتصدير'); return; }
-  const rows = allRecords.map(r => ({
-    'التاريخ': r.createdAt ? (r.createdAt.toDate ? r.createdAt.toDate() : new Date(r.createdAt)).toLocaleDateString('ar-EG') : '',
-    'اسم الطالب': r.fname||'', 'الكنية': r.lname||'',
-    'اسم الأب': r.father||'', 'اسم الجد': r.grandfather||'',
-    'اسم الأم': r.mother||'', 'كنية الأم': r.motherlname||'',
-    'الصف الدراسي': r.grade||'', 'الدولة': r.country||'',
-    'المحافظة': r.province||'', 'رقم الواتساب': r.whatsapp||'',
-    'رقم الموبايل': r.mobile||'', 'ملاحظات': r.notes||''
+window.exportExcel = function(){
+  if(!allRecords.length){alert('لا توجد بيانات للتصدير');return;}
+  const rows = allRecords.map(r=>({
+    'التاريخ': r.createdAt?(r.createdAt.toDate?r.createdAt.toDate():new Date(r.createdAt)).toLocaleDateString('ar-EG'):'',
+    'اسم الطالب':r.fname||'','الكنية':r.lname||'',
+    'اسم الأب':r.father||'','اسم الجد':r.grandfather||'',
+    'اسم الأم الكامل':r.mother||'',
+    'الصف الدراسي':r.grade||'','الدولة':r.country||'',
+    'المحافظة':r.province||'','المدينة / الحي':r.city||'',
+    'الشارع':r.street||'','تفاصيل العنوان':r.addressDetail||'',
+    'رقم الواتساب':r.whatsapp||'',
+    'رقم الموبايل':r.mobile||'','ملاحظات':r.notes||''
   }));
   const ws = XLSX.utils.json_to_sheet(rows);
-  ws['!cols'] = Object.keys(rows[0]).map(() => ({ wch: 22 }));
+  ws['!cols'] = Object.keys(rows[0]).map(()=>({wch:22}));
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'بيانات الطلاب');
-  XLSX.writeFile(wb, `طلاب_الشام_${new Date().toISOString().slice(0,10)}.xlsx`);
+  XLSX.utils.book_append_sheet(wb,ws,'بيانات الطلاب');
+  XLSX.writeFile(wb,`طلاب_الشام_${new Date().toISOString().slice(0,10)}.xlsx`);
 };
 
-window.submitForm = async function() {
-  const required = [
+window.submitForm = async function(){
+  const required=[
     {id:'fname',label:'اسم الطالب'},{id:'lname',label:'الكنية'},
     {id:'father',label:'اسم الأب'},{id:'grandfather',label:'اسم الجد'},
-    {id:'mother',label:'اسم الأم'},{id:'motherlname',label:'كنية الأم'},
-    {id:'grade',label:'الصف'},{id:'country',label:'الدولة'},
-    {id:'province',label:'المحافظة'},{id:'whatsapp',label:'رقم الواتساب'},{id:'mobile',label:'رقم الموبايل'}
+    {id:'mother',label:'اسم الأم الكامل'},{id:'grade',label:'الصف'},
+    {id:'country',label:'الدولة'},{id:'province',label:'المحافظة'},
+    {id:'city',label:'المدينة / الحي'},
+    {id:'whatsapp',label:'رقم الواتساب'},{id:'mobile',label:'رقم الموبايل'}
   ];
-  const missing = required.filter(f => !document.getElementById(f.id).value.trim()).map(f => f.label);
-  if (missing.length) { alert('يرجى تعبئة الحقول التالية:\n' + missing.join('، ')); return; }
-  const msgEl = document.getElementById('formMsg');
-  msgEl.innerHTML = '<div class="loader">⏳ جارٍ الحفظ...</div>';
-  try {
-    await addDoc(collection(db, 'students'), {
-      fname: document.getElementById('fname').value.trim(),
-      lname: document.getElementById('lname').value.trim(),
-      father: document.getElementById('father').value.trim(),
-      grandfather: document.getElementById('grandfather').value.trim(),
-      mother: document.getElementById('mother').value.trim(),
-      motherlname: document.getElementById('motherlname').value.trim(),
-      grade: document.getElementById('grade').value,
-      country: cnames[document.getElementById('country').value] || document.getElementById('country').value,
-      province: document.getElementById('province').value,
-      whatsapp: document.getElementById('wacode').value + document.getElementById('whatsapp').value.trim(),
-      mobile: document.getElementById('mobcode').value + document.getElementById('mobile').value.trim(),
-      notes: document.getElementById('notes').value.trim(),
-      createdAt: Timestamp.now()
+  const missing=required.filter(f=>!document.getElementById(f.id).value.trim()).map(f=>f.label);
+  if(missing.length){alert('يرجى تعبئة الحقول التالية:\n'+missing.join('، '));return;}
+  const msgEl=document.getElementById('formMsg');
+  msgEl.innerHTML='<div class="loader">⏳ جارٍ الحفظ...</div>';
+  try{
+    await addDoc(collection(db,'students'),{
+      fname:document.getElementById('fname').value.trim(),
+      lname:document.getElementById('lname').value.trim(),
+      father:document.getElementById('father').value.trim(),
+      grandfather:document.getElementById('grandfather').value.trim(),
+      mother:document.getElementById('mother').value.trim(),
+      grade:document.getElementById('grade').value,
+      country:cnames[document.getElementById('country').value]||document.getElementById('country').value,
+      province:document.getElementById('province').value,
+      city:document.getElementById('city').value.trim(),
+      street:document.getElementById('street').value.trim(),
+      addressDetail:document.getElementById('addressDetail').value.trim(),
+      whatsapp:document.getElementById('whatsapp').value.trim(),
+      mobile:document.getElementById('mobcode').value+document.getElementById('mobile').value.trim(),
+      notes:document.getElementById('notes').value.trim(),
+      createdAt:Timestamp.now()
     });
-    ['fname','lname','father','grandfather','mother','motherlname','whatsapp','mobile','notes'].forEach(id => document.getElementById(id).value = '');
-    ['country','province','grade'].forEach(id => document.getElementById(id).value = '');
-    document.getElementById('wacode').value = '+963';
-    document.getElementById('mobcode').value = '+963';
-    msgEl.innerHTML = `<div class="success"><div class="success-icon">✅</div><p>تم التسجيل بنجاح!</p><small>سيتواصل معك فريق مدرسة الشام الدولية الافتراضية قريباً</small></div>`;
-    setTimeout(() => msgEl.innerHTML = '', 6000);
-  } catch(e) {
-    msgEl.innerHTML = `<div class="err-box">خطأ في الحفظ: ${e.message}</div>`;
+    ['fname','lname','father','grandfather','mother','whatsapp','mobile','notes','city','street','addressDetail'].forEach(id=>document.getElementById(id).value='');
+    ['country','province','grade'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('mobcode').value='+963';
+    msgEl.innerHTML=`<div class="success"><div class="success-icon">✅</div><p>تم التسجيل بنجاح!</p><small>سيتواصل معك فريق مدرسة الشام الدولية الافتراضية قريباً</small></div>`;
+    setTimeout(()=>msgEl.innerHTML='',6000);
+  }catch(e){
+    msgEl.innerHTML=`<div class="err-box">خطأ في الحفظ: ${e.message}</div>`;
   }
 };
 
-onAuthStateChanged(auth, user => {
-  const isAdmin = user && user.email === ADMIN_EMAIL;
+onAuthStateChanged(auth,user=>{
+  const isAdmin=user&&user.email===ADMIN_EMAIL;
   document.getElementById('loginSection').classList.add('hidden');
-  document.getElementById('adminBar').classList.toggle('hidden', !isAdmin);
-  document.getElementById('adminPanel').classList.toggle('hidden', !isAdmin);
-  document.getElementById('adminToggleBtn').style.display = isAdmin ? 'none' : 'block';
-  if (isAdmin) {
-    document.getElementById('adminEmailDisplay').textContent = user.email;
+  document.getElementById('adminBar').classList.toggle('hidden',!isAdmin);
+  document.getElementById('adminPanel').classList.toggle('hidden',!isAdmin);
+  document.getElementById('adminToggleBtn').style.display=isAdmin?'none':'block';
+  if(isAdmin){
+    document.getElementById('adminEmailDisplay').textContent=user.email;
     loadRecords();
   }
 });
 </script>
 <script>
+/* ===== نجوم + جسيمات ===== */
 (function(){
-  const sizes=[4,6,5,8,4,6,5,4,7,5,4,6];
-  const delays=[0,3,7,1,9,5,2,11,4,8,6,10];
-  const durations=[18,22,25,20,28,15,24,19,26,21,23,17];
-  const lefts=[5,12,20,30,42,55,63,70,78,85,92,48];
-  sizes.forEach((s,i)=>{
+  /* نجوم ثابتة */
+  const sc=document.getElementById('starsContainer');
+  for(let i=0;i<120;i++){
+    const s=document.createElement('div');
+    const sz=Math.random()*2.5+0.5;
+    s.className='star';
+    s.style.cssText='width:'+sz+'px;height:'+sz+'px;top:'+Math.random()*100+'%;left:'+Math.random()*100+'%;animation-duration:'+(2+Math.random()*4)+'s;animation-delay:'+Math.random()*5+'s';
+    sc.appendChild(s);
+  }
+  /* جسيمات طائرة */
+  const colors=['rgba(167,139,250,0.5)','rgba(99,102,241,0.45)','rgba(56,189,248,0.4)','rgba(255,255,255,0.3)','rgba(245,158,11,0.35)'];
+  const sizes=[4,6,5,8,5,7,4,6,9,5,4,7,5,6];
+  const delays=[0,4,8,1,10,5,2,12,3,7,6,9,11,2];
+  const durations=[20,26,18,30,22,28,16,24,19,25,21,23,17,29];
+  const lefts=[4,11,19,29,38,50,60,68,75,83,90,45,24,56];
+  sizes.forEach((sz,i)=>{
     const p=document.createElement('div');
     p.className='particle';
-    p.style.cssText='width:'+s+'px;height:'+s+'px;left:'+lefts[i]+'%;animation-duration:'+durations[i]+'s;animation-delay:'+delays[i]+'s';
+    p.style.cssText='width:'+sz+'px;height:'+sz+'px;left:'+lefts[i]+'%;background:'+colors[i%colors.length]+';animation-duration:'+durations[i]+'s;animation-delay:'+delays[i]+'s';
     document.body.appendChild(p);
   });
 })();
