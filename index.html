@@ -169,7 +169,7 @@
     <h1>مدرسة الشام الدولية الافتراضية</h1>
     <h2>Al-Sham International Virtual School</h2>
     <div class="header-divider"></div>
-    <p>نموذج تسجيل بيانات الطالب للتواصل وإيصال الإشعارات </p>
+    <p>نموذج تسجيل بيانات الطالب للتواصل وإيصال الإشعارات والكتب</p>
   </div>
 
   <!-- Admin bar -->
@@ -293,12 +293,18 @@
         <div class="f">
           <label>رقم الموبايل للتواصل <span class="req">*</span></label>
           <div class="pw">
-            <select id="mobcode">
-              <option value="+963">🇸🇾 +963</option>
-              <option value="+966">🇸🇦 +966</option>
-              <option value="+971">🇦🇪 +971</option>
-              <option value="+974">🇶🇦 +974</option>
-            </select>
+            <div style="position:relative;width:138px;flex-shrink:0">
+              <div id="mobFlagDisplay" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);pointer-events:none;display:flex;align-items:center;gap:5px;z-index:2">
+                <span id="mobFlagIcon"></span>
+                <span id="mobFlagCode" style="font-size:14px;color:#1a1a1a;font-weight:500"></span>
+              </div>
+              <select id="mobcode" onchange="updateMobFlag()" style="padding-right:10px;color:transparent;width:100%">
+                <option value="+963">سوريا +963</option>
+                <option value="+966">السعودية +966</option>
+                <option value="+971">الإمارات +971</option>
+                <option value="+974">قطر +974</option>
+              </select>
+            </div>
             <input type="tel" id="mobile" placeholder="رقم الموبايل">
           </div>
         </div>
@@ -510,6 +516,39 @@ onAuthStateChanged(auth,user=>{
     loadRecords();
   }
 });
+
+/* علم سوريا الجديد SVG مصغر */
+const syriaFlagSVG = `<svg xmlns="http://www.w3.org/2000/svg" width="26" height="17" viewBox="0 0 3 2" style="border-radius:2px;vertical-align:middle;box-shadow:0 1px 3px rgba(0,0,0,0.25)">
+  <rect width="3" height="0.667" y="0" fill="#007A3D"/>
+  <rect width="3" height="0.667" y="0.667" fill="#FFFFFF"/>
+  <rect width="3" height="0.667" y="1.333" fill="#000000"/>
+  <polygon points="1.5,0.72 1.56,0.90 1.75,0.90 1.60,1.01 1.66,1.19 1.5,1.08 1.34,1.19 1.40,1.01 1.25,0.90 1.44,0.90" fill="#FF0000"/>
+  <polygon points="1.1,0.72 1.16,0.90 1.35,0.90 1.20,1.01 1.26,1.19 1.1,1.08 0.94,1.19 1.00,1.01 0.85,0.90 1.04,0.90" fill="#FF0000"/>
+  <polygon points="1.9,0.72 1.96,0.90 2.15,0.90 2.00,1.01 2.06,1.19 1.9,1.08 1.74,1.19 1.80,1.01 1.65,0.90 1.84,0.90" fill="#FF0000"/>
+</svg>`;
+
+const flagMap = {
+  '+963': syriaFlagSVG,
+  '+966': '🇸🇦',
+  '+971': '🇦🇪',
+  '+974': '🇶🇦'
+};
+
+window.updateMobFlag = function(){
+  const val = document.getElementById('mobcode').value;
+  const iconEl = document.getElementById('mobFlagIcon');
+  const codeEl = document.getElementById('mobFlagCode');
+  const flag = flagMap[val];
+  if(flag && flag.startsWith('<svg')){
+    iconEl.innerHTML = flag;
+  } else {
+    iconEl.textContent = flag || '';
+  }
+  codeEl.textContent = val;
+};
+/* تهيئة عند التحميل */
+document.addEventListener('DOMContentLoaded', ()=>{ window.updateMobFlag(); });
+setTimeout(()=>{ window.updateMobFlag(); }, 100);
 </script>
 <script>
 /* ===== نجوم + جسيمات ===== */
