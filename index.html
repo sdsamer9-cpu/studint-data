@@ -90,6 +90,11 @@
   .success small{color:#047857;font-size:13px}
 
   /* ===== Error ===== */
+  .dup-box{background:linear-gradient(135deg,#fffbeb,#fef3c7);border:2px solid #f59e0b;border-radius:14px;padding:18px;text-align:center;margin-top:10px;box-shadow:0 4px 16px rgba(245,158,11,0.2)}
+  .dup-icon{font-size:36px;margin-bottom:8px}
+  .dup-title{color:#92400e;font-size:16px;font-weight:800;margin-bottom:6px}
+  .dup-info{color:#78350f;font-size:14px;margin-bottom:6px}
+  .dup-box small{color:#92400e;font-size:12px}
   .err-box{background:#fef2f2;border:1px solid #fca5a5;border-radius:9px;
     padding:10px 14px;font-size:13px;color:#b91c1c;margin-top:8px;text-align:center}
 
@@ -355,7 +360,7 @@
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-import { getFirestore, collection, addDoc, getDocs, query, orderBy, Timestamp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getFirestore, collection, addDoc, getDocs, query, orderBy, Timestamp, deleteDoc, doc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
 const cfg = {
   apiKey:"AIzaSyAgV0C0GHdWotIW5zqQsjasiAJbWFVw8KQ",
@@ -439,6 +444,17 @@ window.doLogin = async function(){
 
 window.doLogout = async function(){ await signOut(auth); };
 
+window.deleteRecord = async function(docId){
+  if(!confirm('هل أنت متأكد من حذف هذا السجل؟\nلا يمكن التراجع عن هذا الإجراء.')) return;
+  try{
+    await deleteDoc(doc(db,'students',docId));
+    alert('✅ تم حذف السجل بنجاح');
+    loadRecords();
+  }catch(e){
+    alert('خطأ في الحذف: '+e.message);
+  }
+};
+
 window.loadRecords = async function(){
   const area = document.getElementById('recordsArea');
   area.innerHTML='<div class="loader">⏳ جارٍ تحميل السجلات...</div>';
@@ -457,7 +473,7 @@ window.loadRecords = async function(){
     document.getElementById('todayCount').textContent = todayRecs.length;
     if(!allRecords.length){area.innerHTML='<div class="loader">لا توجد سجلات بعد</div>';return;}
     area.innerHTML=`<div class="tbl-wrap"><table>
-      <thead><tr>${['#','الاسم الكامل','الصف','الدولة','المحافظة','المدينة','الواتساب','الموبايل','التاريخ'].map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+      <thead><tr>${['#','الاسم الكامل','الصف','الدولة','المحافظة','المدينة','الواتساب','الموبايل','التاريخ','حذف'].map(h=>`<th>${h}</th>`).join('')}</tr></thead>
       <tbody>${allRecords.map((r,i)=>{
         const d=r.createdAt?(r.createdAt.toDate?r.createdAt.toDate():new Date(r.createdAt)).toLocaleDateString('ar-EG'):'';
         return `<tr>
@@ -470,6 +486,7 @@ window.loadRecords = async function(){
           <td style="direction:ltr;text-align:right">${r.whatsapp||''}</td>
           <td style="direction:ltr;text-align:right">${r.mobile||''}</td>
           <td style="color:#888">${d}</td>
+          <td><button onclick="deleteRecord('${r.id}')" style="background:#fef2f2;border:1px solid #fca5a5;color:#b91c1c;border-radius:7px;padding:4px 10px;cursor:pointer;font-size:12px;font-weight:600" title="حذف هذا السجل">🗑️ حذف</button></td>
         </tr>`;
       }).join('')}</tbody>
     </table></div>`;
@@ -510,8 +527,36 @@ window.submitForm = async function(){
   const missing=required.filter(f=>!document.getElementById(f.id).value.trim()).map(f=>f.label);
   if(missing.length){alert('يرجى تعبئة الحقول التالية:\n'+missing.join('، '));return;}
   const msgEl=document.getElementById('formMsg');
-  msgEl.innerHTML='<div class="loader">⏳ جارٍ الحفظ...</div>';
+  msgEl.innerHTML='<div class="loader">⏳ جارٍ التحقق...</div>';
   try{
+    /* ===== التحقق من التكرار ===== */
+    const fname  = document.getElementById('fname').value.trim().toLowerCase();
+    const lname  = document.getElementById('lname').value.trim().toLowerCase();
+    const father = document.getElementById('father').value.trim().toLowerCase();
+    const mother = document.getElementById('mother').value.trim().toLowerCase();
+    const grade  = document.getElementById('grade').value;
+    const dupSnap = await getDocs(collection(db,'students'));
+    let duplicate = null;
+    dupSnap.forEach(d=>{
+      const r=d.data();
+      if(
+        (r.fname||'').toLowerCase()===fname &&
+        (r.lname||'').toLowerCase()===lname &&
+        (r.father||'').toLowerCase()===father &&
+        (r.mother||'').toLowerCase()===mother &&
+        (r.grade||'')===grade
+      ){ duplicate=r; }
+    });
+    if(duplicate){
+      msgEl.innerHTML=`<div class="dup-box">
+        <div class="dup-icon">⚠️</div>
+        <p class="dup-title">هذا الطالب مسجّل مسبقاً!</p>
+        <p class="dup-info">تم تسجيل <strong>${duplicate.fname} ${duplicate.lname}</strong> في صف <strong>${duplicate.grade}</strong> من قبل.</p>
+        <small>إذا كانت معلوماتك تغيّرت، تواصل مع الآنسة بيداء الصفدي لتعديل السجل.</small>
+      </div>`;
+      return;
+    }
+    msgEl.innerHTML='<div class="loader">⏳ جارٍ الحفظ...</div>';
     await addDoc(collection(db,'students'),{
       fname:document.getElementById('fname').value.trim(),
       lname:document.getElementById('lname').value.trim(),
