@@ -21,7 +21,7 @@
   .orb4{width:220px;height:220px;background:rgba(245,158,11,0.12);top:60%;right:10%;animation-duration:13s;animation-delay:6s}
   @keyframes orbf{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-40px) scale(1.1)}}
 
-  .wrap{max-width:700px;margin:0 auto;position:relative;z-index:1}
+  .wrap{max-width:1100px;margin:0 auto;position:relative;z-index:1}
 
   /* ===== Header ===== */
   .header{text-align:center;padding:1.75rem 1.25rem 1.5rem;
@@ -114,7 +114,13 @@
 
   /* ===== Table ===== */
   .tbl-wrap{overflow-x:auto;margin-top:12px;border-radius:10px;border:1px solid #e0e7ff}
-  table{width:100%;border-collapse:collapse;font-size:12px;direction:rtl;min-width:620px}
+  table{width:100%;border-collapse:collapse;font-size:12px;direction:rtl;table-layout:auto}
+  .cb{width:16px;height:16px;cursor:pointer;accent-color:#4f46e5}
+  .sel-bar{display:none;align-items:center;justify-content:space-between;background:#fef3c7;border:1px solid #f59e0b;border-radius:10px;padding:10px 14px;margin-top:10px;gap:10px;flex-wrap:wrap}
+  .sel-bar.show{display:flex}
+  .sel-count{font-size:13px;font-weight:700;color:#92400e}
+  .btn-del-sel{background:linear-gradient(135deg,#dc2626,#b91c1c);border:none;border-radius:8px;padding:8px 18px;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+  .btn-del-sel:hover{opacity:0.9}
   thead tr{background:linear-gradient(90deg,#eef2ff,#e0e7ff)}
   th{padding:10px 8px;font-weight:800;color:#3730a3;border-bottom:2px solid #c7d2fe;text-align:right;white-space:nowrap}
   td{padding:8px 8px;border-bottom:1px solid #f0f0ff}
@@ -444,6 +450,37 @@ window.doLogin = async function(){
 
 window.doLogout = async function(){ await signOut(auth); };
 
+function updateSelBar(){
+  const checked = document.querySelectorAll('.row-cb:checked');
+  const bar = document.getElementById('selBar');
+  const cnt = document.getElementById('selCount');
+  if(bar){ bar.classList.toggle('show', checked.length>0); }
+  if(cnt){ cnt.textContent = checked.length + ' محدد'; }
+}
+
+async function deleteSelected(){
+  const checked = [...document.querySelectorAll('.row-cb:checked')];
+  if(!checked.length){ alert('يرجى تحديد سجل واحد على الأقل'); return; }
+  const ids = checked.map(cb=>cb.dataset.id);
+  if(!confirm('هل أنت متأكد من حذف '+ids.length+' سجل؟\nلا يمكن التراجع عن هذا الإجراء.')) return;
+  let deleted=0, failed=0;
+  for(const id of ids){
+    try{
+      await deleteDoc(doc(db,'students',id));
+      deleted++;
+    }catch(e){
+      failed++;
+      console.error('Failed to delete',id,e);
+    }
+  }
+  if(failed===0){
+    alert('✅ تم حذف '+deleted+' سجل بنجاح');
+  } else {
+    alert('تم حذف '+deleted+' سجل\nفشل حذف '+failed+' سجل');
+  }
+  loadRecords();
+}
+
 window.deleteRecord = async function(docId){
   if(!confirm('هل أنت متأكد من حذف هذا السجل؟\nلا يمكن التراجع عن هذا الإجراء.')) return;
   try{
@@ -472,24 +509,29 @@ window.loadRecords = async function(){
     document.getElementById('totalCount').textContent = allRecords.length;
     document.getElementById('todayCount').textContent = todayRecs.length;
     if(!allRecords.length){area.innerHTML='<div class="loader">لا توجد سجلات بعد</div>';return;}
-    area.innerHTML=`<div class="tbl-wrap"><table>
-      <thead><tr>${['#','الاسم الكامل','الصف','الدولة','المحافظة','المدينة','الواتساب','الموبايل','التاريخ','حذف'].map(h=>`<th>${h}</th>`).join('')}</tr></thead>
-      <tbody>${allRecords.map((r,i)=>{
-        const d=r.createdAt?(r.createdAt.toDate?r.createdAt.toDate():new Date(r.createdAt)).toLocaleDateString('ar-EG'):'';
-        return `<tr>
-          <td style="color:#aaa">${i+1}</td>
-          <td><strong>${r.fname||''} ${r.lname||''}</strong></td>
-          <td><span class="badge">${r.grade||''}</span></td>
-          <td>${r.country||''}</td>
-          <td>${r.province||''}</td>
-          <td>${r.city||''}</td>
-          <td style="direction:ltr;text-align:right">${r.whatsapp||''}</td>
-          <td style="direction:ltr;text-align:right">${r.mobile||''}</td>
-          <td style="color:#888">${d}</td>
-          <td><button onclick="deleteRecord('${r.id}')" style="background:#fef2f2;border:1px solid #fca5a5;color:#b91c1c;border-radius:7px;padding:4px 10px;cursor:pointer;font-size:12px;font-weight:600" title="حذف هذا السجل">🗑️ حذف</button></td>
-        </tr>`;
-      }).join('')}</tbody>
-    </table></div>`;
+    let tableHTML = `<div class="tbl-wrap"><table>
+      <thead><tr>${`<th><input type='checkbox' class='cb' id='checkAll' title='تحديد الكل'></th>`+['#','الاسم الكامل','الصف','الدولة','المحافظة','المدينة','الواتساب','الموبايل','التاريخ',''].map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>`;
+    allRecords.forEach((r,i)=>{
+      const d=r.createdAt?(r.createdAt.toDate?r.createdAt.toDate():new Date(r.createdAt)).toLocaleDateString('ar-EG'):'';
+      tableHTML += `<tr>
+        <td style="text-align:center;padding:8px"><input type="checkbox" class="row-cb" data-id="${r.id}" style="width:16px;height:16px;cursor:pointer;accent-color:#4f46e5"></td>
+        <td style="color:#aaa;white-space:nowrap">${i+1}</td>
+        <td style="white-space:nowrap"><strong>${r.fname||''} ${r.lname||''}</strong></td>
+        <td><span class="badge" style="white-space:nowrap">${r.grade||''}</span></td>
+        <td style="white-space:nowrap">${r.country||''}</td>
+        <td style="white-space:nowrap">${r.province||''}</td>
+        <td style="white-space:nowrap">${r.city||''}</td>
+        <td style="direction:ltr;text-align:right;white-space:nowrap">${r.whatsapp||''}</td>
+        <td style="direction:ltr;text-align:right;white-space:nowrap">${r.mobile||''}</td>
+        <td style="color:#888;white-space:nowrap">${d}</td>
+        <td style="text-align:center"><button data-id="${r.id}" class="del-btn" style="background:#fef2f2;border:1.5px solid #fca5a5;color:#b91c1c;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:13px;font-weight:700;white-space:nowrap">🗑️</button></td>
+      </tr>`;
+    });
+    tableHTML += '</tbody></table></div>';
+    area.innerHTML = tableHTML;
+    area.querySelectorAll('.del-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>deleteRecord(btn.dataset.id));
+    });
   }catch(e){
     area.innerHTML=`<div class="err-box">خطأ في التحميل: ${e.message}</div>`;
   }
@@ -529,32 +571,37 @@ window.submitForm = async function(){
   const msgEl=document.getElementById('formMsg');
   msgEl.innerHTML='<div class="loader">⏳ جارٍ التحقق...</div>';
   try{
-    /* ===== التحقق من التكرار ===== */
+    /* ===== التحقق من التكرار (للآدمن فقط لأن القراءة محمية) ===== */
     const fname  = document.getElementById('fname').value.trim().toLowerCase();
     const lname  = document.getElementById('lname').value.trim().toLowerCase();
     const father = document.getElementById('father').value.trim().toLowerCase();
     const mother = document.getElementById('mother').value.trim().toLowerCase();
     const grade  = document.getElementById('grade').value;
-    const dupSnap = await getDocs(collection(db,'students'));
-    let duplicate = null;
-    dupSnap.forEach(d=>{
-      const r=d.data();
-      if(
-        (r.fname||'').toLowerCase()===fname &&
-        (r.lname||'').toLowerCase()===lname &&
-        (r.father||'').toLowerCase()===father &&
-        (r.mother||'').toLowerCase()===mother &&
-        (r.grade||'')===grade
-      ){ duplicate=r; }
-    });
-    if(duplicate){
-      msgEl.innerHTML=`<div class="dup-box">
-        <div class="dup-icon">⚠️</div>
-        <p class="dup-title">هذا الطالب مسجّل مسبقاً!</p>
-        <p class="dup-info">تم تسجيل <strong>${duplicate.fname} ${duplicate.lname}</strong> في صف <strong>${duplicate.grade}</strong> من قبل.</p>
-        <small>إذا كانت معلوماتك تغيّرت، تواصل مع الآنسة بيداء الصفدي لتعديل السجل.</small>
-      </div>`;
-      return;
+    try{
+      const dupSnap = await getDocs(collection(db,'students'));
+      let duplicate = null;
+      dupSnap.forEach(d=>{
+        const r=d.data();
+        if(
+          (r.fname||'').toLowerCase()===fname &&
+          (r.lname||'').toLowerCase()===lname &&
+          (r.father||'').toLowerCase()===father &&
+          (r.mother||'').toLowerCase()===mother &&
+          (r.grade||'')===grade
+        ){ duplicate=r; }
+      });
+      if(duplicate){
+        msgEl.innerHTML=`<div class="dup-box">
+          <div class="dup-icon">⚠️</div>
+          <p class="dup-title">هذا الطالب مسجّل مسبقاً!</p>
+          <p class="dup-info">تم تسجيل <strong>${duplicate.fname} ${duplicate.lname}</strong> في صف <strong>${duplicate.grade}</strong> من قبل.</p>
+          <small>إذا كانت معلوماتك تغيّرت، تواصل مع الآنسة بيداء الصفدي لتعديل السجل.</small>
+        </div>`;
+        return;
+      }
+    }catch(dupErr){
+      /* الضيف لا يملك صلاحية القراءة — نتجاوز التحقق ونكمل الحفظ */
+      console.log('Duplicate check skipped for guest');
     }
     msgEl.innerHTML='<div class="loader">⏳ جارٍ الحفظ...</div>';
     await addDoc(collection(db,'students'),{
