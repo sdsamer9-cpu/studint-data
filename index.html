@@ -186,7 +186,7 @@
   <!-- Admin bar -->
   <div id="adminBar" class="admin-bar hidden">
     <span>✅ آدمن: <strong id="adminEmailDisplay"></strong></span>
-    <button class="btn btn-red" style="width:auto;padding:7px 16px;font-size:13px" id="doLogoutBtn">تسجيل خروج</button>
+    <button class="btn btn-red" style="width:auto;padding:7px 16px;font-size:13px" onclick="doLogout()">تسجيل خروج</button>
   </div>
 
   <!-- Login -->
@@ -202,7 +202,7 @@
         <input type="password" id="adminPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
       </div>
     </div>
-    <button class="btn" id="doLoginBtn">🔑 تسجيل الدخول</button>
+    <button class="btn" onclick="doLogin()">🔑 تسجيل الدخول</button>
     <div id="loginErr"></div>
   </div>
 
@@ -323,7 +323,7 @@
         </div>
         <div class="f"><label>ملاحظات إضافية</label><textarea id="notes" placeholder="أي معلومات إضافية تودّ إضافتها..."></textarea></div>
       </div>
-      <button class="btn" id="submitFormBtn">📤 تسجيل البيانات</button>
+      <button class="btn" onclick="submitForm()">📤 تسجيل البيانات</button>
       <div id="formMsg"></div>
     </div>
 
@@ -344,32 +344,20 @@
   <div id="adminPanel" class="hidden">
     <div class="card">
       <p class="sec"><span class="sec-icon">📊</span> لوحة الآدمن — سجلات الطلاب</p>
-      <!-- شريط حذف المحددين الثابت -->
-      <div id="selBar" style="display:none;align-items:center;gap:12px;background:linear-gradient(135deg,#fef3c7,#fde68a);border:2px solid #f59e0b;border-radius:12px;padding:12px 16px;margin-bottom:14px;flex-wrap:wrap">
-        <span id="selCount" style="font-size:14px;font-weight:800;color:#92400e">0 محدد</span>
-        <button id="delSelBtn" style="background:linear-gradient(135deg,#dc2626,#b91c1c);border:none;border-radius:9px;padding:9px 20px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 3px 10px rgba(220,38,38,0.35)">🗑️ حذف المحددين</button>
-        <button id="clearSelBtn" style="background:#fff;border:1.5px solid #d1d5db;border-radius:9px;padding:9px 16px;color:#374151;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">✖ إلغاء التحديد</button>
-      </div>
       <div class="stat-row">
         <div class="stat"><div class="stat-n" id="totalCount">—</div><div class="stat-l">إجمالي الطلاب</div></div>
         <div class="stat"><div class="stat-n" id="todayCount">—</div><div class="stat-l">مسجّلون اليوم</div></div>
       </div>
       <div class="btn-row">
-        <button class="btn btn-green" id="exportBtnTop" style="cursor:pointer">📥 تصدير إلى Excel</button>
-        <button class="btn btn-outline" id="refreshBtn" style="cursor:pointer">🔄 تحديث</button>
-      </div>
-      <!-- شريط الحذف الثابت -->
-      <div id="selBar" style="display:none;align-items:center;gap:12px;background:linear-gradient(135deg,#fef3c7,#fde68a);border:2px solid #f59e0b;border-radius:12px;padding:12px 16px;margin-bottom:10px;flex-wrap:wrap">
-        <span id="selCount" style="font-size:14px;font-weight:800;color:#92400e">0 محدد</span>
-        <button id="delSelBtn" style="background:linear-gradient(135deg,#dc2626,#b91c1c);border:none;border-radius:9px;padding:9px 20px;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 3px 10px rgba(220,38,38,0.35)">🗑️ حذف المحددين</button>
-        <button id="clearSelBtn" style="background:#fff;border:1.5px solid #d1d5db;border-radius:9px;padding:9px 16px;color:#374151;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">✖ إلغاء التحديد</button>
+        <button class="btn btn-green" onclick="exportExcel()">📥 تصدير إلى Excel</button>
+        <button class="btn btn-outline" onclick="loadRecords()">🔄 تحديث</button>
       </div>
       <div id="recordsArea"></div>
     </div>
   </div>
 
   <div class="toggle-admin" id="adminToggleBtn">
-    <button id="toggleAdminBtn">🔐 دخول الآدمن</button>
+    <button onclick="toggleLogin()">🔐 دخول الآدمن</button>
   </div>
 
 </div><!-- end wrap -->
@@ -521,88 +509,29 @@ window.loadRecords = async function(){
     document.getElementById('totalCount').textContent = allRecords.length;
     document.getElementById('todayCount').textContent = todayRecs.length;
     if(!allRecords.length){area.innerHTML='<div class="loader">لا توجد سجلات بعد</div>';return;}
-
-    let out = `<div class="tbl-wrap"><table>
-      <thead>
-        <tr style="background:linear-gradient(90deg,#eef2ff,#e0e7ff)">
-          <th style="text-align:center;padding:10px 8px;width:40px">
-            <input type="checkbox" id="checkAll" style="width:17px;height:17px;cursor:pointer;accent-color:#4f46e5" title="تحديد الكل">
-          </th>
-          ${['#','الاسم الكامل','الصف','الدولة','المحافظة','المدينة','الواتساب','الموبايل','التاريخ'].map(h=>`<th style="padding:10px 8px;font-weight:800;color:#3730a3;border-bottom:2px solid #c7d2fe;text-align:right;white-space:nowrap">${h}</th>`).join('')}
-        </tr>
-      </thead>
-      <tbody>`;
-
+    let tableHTML = `<div class="tbl-wrap"><table>
+      <thead><tr>${`<th><input type='checkbox' class='cb' id='checkAll' title='تحديد الكل'></th>`+['#','الاسم الكامل','الصف','الدولة','المحافظة','المدينة','الواتساب','الموبايل','التاريخ',''].map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>`;
     allRecords.forEach((r,i)=>{
       const d=r.createdAt?(r.createdAt.toDate?r.createdAt.toDate():new Date(r.createdAt)).toLocaleDateString('ar-EG'):'';
-      const bg = i%2===0 ? '#ffffff' : '#f9f8ff';
-      out += `<tr style="background:${bg};transition:background 0.15s" onmouseover="this.style.background='#f0f0ff'" onmouseout="this.style.background='${bg}'">
-        <td style="text-align:center;padding:8px">
-          <input type="checkbox" class="row-cb" data-id="${r.id}" style="width:17px;height:17px;cursor:pointer;accent-color:#4f46e5">
-        </td>
-        <td style="color:#aaa;white-space:nowrap;padding:8px">${i+1}</td>
-        <td style="white-space:nowrap;padding:8px"><strong>${r.fname||''} ${r.lname||''}</strong></td>
-        <td style="padding:8px"><span style="display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;background:#ede9fe;color:#5b21b6;white-space:nowrap">${r.grade||''}</span></td>
-        <td style="white-space:nowrap;padding:8px">${r.country||''}</td>
-        <td style="white-space:nowrap;padding:8px">${r.province||''}</td>
-        <td style="white-space:nowrap;padding:8px">${r.city||''}</td>
-        <td style="direction:ltr;text-align:right;white-space:nowrap;padding:8px">${r.whatsapp||''}</td>
-        <td style="direction:ltr;text-align:right;white-space:nowrap;padding:8px">${r.mobile||''}</td>
-        <td style="color:#888;white-space:nowrap;padding:8px">${d}</td>
-
+      tableHTML += `<tr>
+        <td style="text-align:center;padding:8px"><input type="checkbox" class="row-cb" data-id="${r.id}" style="width:16px;height:16px;cursor:pointer;accent-color:#4f46e5"></td>
+        <td style="color:#aaa;white-space:nowrap">${i+1}</td>
+        <td style="white-space:nowrap"><strong>${r.fname||''} ${r.lname||''}</strong></td>
+        <td><span class="badge" style="white-space:nowrap">${r.grade||''}</span></td>
+        <td style="white-space:nowrap">${r.country||''}</td>
+        <td style="white-space:nowrap">${r.province||''}</td>
+        <td style="white-space:nowrap">${r.city||''}</td>
+        <td style="direction:ltr;text-align:right;white-space:nowrap">${r.whatsapp||''}</td>
+        <td style="direction:ltr;text-align:right;white-space:nowrap">${r.mobile||''}</td>
+        <td style="color:#888;white-space:nowrap">${d}</td>
+        <td style="text-align:center"><button data-id="${r.id}" class="del-btn" style="background:#fef2f2;border:1.5px solid #fca5a5;color:#b91c1c;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:13px;font-weight:700;white-space:nowrap">🗑️</button></td>
       </tr>`;
     });
-
-    out += '</tbody></table></div>';
-    area.innerHTML = out;
-
-    /* ===== أحداث الـ checkboxes ===== */
-    const checkAll = document.getElementById('checkAll');
-    const selBar   = document.getElementById('selBar');
-    const selCount = document.getElementById('selCount');
-    const delSelBtn  = document.getElementById('delSelBtn');
-    const clearSelBtn = document.getElementById('clearSelBtn');
-
-    function refreshSelBar(){
-      const cbs = [...document.querySelectorAll('.row-cb:checked')];
-      const bar = document.getElementById('selBar');
-      const cnt = document.getElementById('selCount');
-      if(bar) bar.style.display = cbs.length > 0 ? 'flex' : 'none';
-      if(cnt) cnt.textContent = cbs.length + ' محدد';
-      checkAll.indeterminate = cbs.length>0 && cbs.length<allRecords.length;
-      checkAll.checked = cbs.length===allRecords.length && cbs.length>0;
-    }
-
-    checkAll.addEventListener('change', ()=>{
-      document.querySelectorAll('.row-cb').forEach(cb=>cb.checked=checkAll.checked);
-      refreshSelBar();
-    };
-
-    document.querySelectorAll('.row-cb').forEach(cb=>{
-      cb.addEventListener('change', refreshSelBar);
+    tableHTML += '</tbody></table></div>';
+    area.innerHTML = tableHTML;
+    area.querySelectorAll('.del-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>deleteRecord(btn.dataset.id));
     });
-
-    delSelBtn.addEventListener('click', async ()=>{
-      const ids = [...document.querySelectorAll('.row-cb:checked')].map(cb=>cb.dataset.id);
-      if(!ids.length) return;
-      if(!confirm('هل أنت متأكد من حذف '+ids.length+' سجل؟\nلا يمكن التراجع عن هذا الإجراء.')) return;
-      let deleted=0, failed=0;
-      for(const id of ids){
-        try{ await deleteDoc(doc(db,'students',id)); deleted++; }
-        catch(e){ failed++; console.error(e); }
-      }
-      alert(failed===0 ? '✅ تم حذف '+deleted+' سجل بنجاح' : 'تم حذف '+deleted+' وفشل '+failed);
-      loadRecords();
-    });
-
-    clearSelBtn.addEventListener('click', ()=>{
-      document.querySelectorAll('.row-cb').forEach(cb=>cb.checked=false);
-      checkAll.checked=false;
-      refreshSelBar();
-    });
-
-
-
   }catch(e){
     area.innerHTML=`<div class="err-box">خطأ في التحميل: ${e.message}</div>`;
   }
@@ -738,28 +667,7 @@ window.updateMobFlag = function(){
   codeEl.textContent = val;
 };
 /* تهيئة عند التحميل */
-document.addEventListener('DOMContentLoaded', ()=>{
-  window.updateMobFlag();
-
-  /* ===== ربط أزرار الآدمن ===== */
-  const toggleBtn = document.getElementById('toggleAdminBtn');
-  if(toggleBtn) toggleBtn.addEventListener('click', window.toggleLogin);
-
-  const loginBtn = document.getElementById('doLoginBtn');
-  if(loginBtn) loginBtn.addEventListener('click', window.doLogin);
-
-  const logoutBtn = document.getElementById('doLogoutBtn');
-  if(logoutBtn) logoutBtn.addEventListener('click', window.doLogout);
-
-  const exportBtn = document.getElementById('exportBtnTop');
-  if(exportBtn) exportBtn.addEventListener('click', window.exportExcel);
-
-  const refreshBtn = document.getElementById('refreshBtn');
-  if(refreshBtn) refreshBtn.addEventListener('click', window.loadRecords);
-
-  const submitBtn = document.getElementById('submitFormBtn');
-  if(submitBtn) submitBtn.addEventListener('click', window.submitForm);
-});
+document.addEventListener('DOMContentLoaded', ()=>{ window.updateMobFlag(); });
 setTimeout(()=>{ window.updateMobFlag(); }, 50);
 setTimeout(()=>{ window.updateMobFlag(); }, 300);
 </script>
