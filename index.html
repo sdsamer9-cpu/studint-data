@@ -406,33 +406,43 @@ async function submitForm(){
   const msg = document.getElementById('formMsg');
   msg.innerHTML='<div class="loader">⏳ جارٍ التحقق...</div>';
   /* ===== التحقق من التكرار: الاسم + الأب + الأم + الجد ===== */
+  /* الطريقة 1: localStorage (تمنع التكرار من نفس الجهاز فوراً) */
+  const fn  = document.getElementById('fname').value.trim().toLowerCase().replace(/\s+/g,' ');
+  const fa  = document.getElementById('father').value.trim().toLowerCase().replace(/\s+/g,' ');
+  const mo  = document.getElementById('mother').value.trim().toLowerCase().replace(/\s+/g,' ');
+  const gf  = document.getElementById('grandfather').value.trim().toLowerCase().replace(/\s+/g,' ');
+  const dupKey = 'reg_' + btoa(encodeURIComponent(fn+'|'+fa+'|'+mo+'|'+gf)).replace(/=/g,'');
+  if(localStorage.getItem(dupKey)){
+    msg.innerHTML=`<div class="dup-box">
+      <div class="d-icon">⚠️</div>
+      <p class="d-title">تم تسجيلك مسبقاً!</p>
+      <p class="d-info">بيانات هذا الطالب موجودة بالفعل في النظام.</p>
+      <small>إذا كانت بياناتك تغيّرت، تواصل مع الآنسة بيداء الصفدي للتعديل</small>
+    </div>`;
+    return;
+  }
+  /* الطريقة 2: Firestore (للآدمن أو عند توفر الصلاحية) */
+  msg.innerHTML='<div class="loader">⏳ جارٍ التحقق...</div>';
   try{
-    const fn  = document.getElementById('fname').value.trim().toLowerCase().replace(/\s+/g,' ');
-    const fa  = document.getElementById('father').value.trim().toLowerCase().replace(/\s+/g,' ');
-    const mo  = document.getElementById('mother').value.trim().toLowerCase().replace(/\s+/g,' ');
-    const gf  = document.getElementById('grandfather').value.trim().toLowerCase().replace(/\s+/g,' ');
-    msg.innerHTML='<div class="loader">⏳ جارٍ التحقق من عدم التكرار...</div>';
     const snap = await getDocs(collection(db,'students'));
     let dup = null;
     snap.forEach(d=>{
       const r = d.data();
-      const rFn  = (r.fname||'').toLowerCase().replace(/\s+/g,' ').trim();
-      const rFa  = (r.father||'').toLowerCase().replace(/\s+/g,' ').trim();
-      const rMo  = (r.mother||'').toLowerCase().replace(/\s+/g,' ').trim();
-      const rGf  = (r.grandfather||'').toLowerCase().replace(/\s+/g,' ').trim();
-      if(rFn===fn && rFa===fa && rMo===mo && rGf===gf) dup=r;
+      if((r.fname||'').toLowerCase().replace(/\s+/g,' ').trim()===fn &&
+         (r.father||'').toLowerCase().replace(/\s+/g,' ').trim()===fa &&
+         (r.mother||'').toLowerCase().replace(/\s+/g,' ').trim()===mo &&
+         (r.grandfather||'').toLowerCase().replace(/\s+/g,' ').trim()===gf) dup=r;
     });
     if(dup){
       msg.innerHTML=`<div class="dup-box">
         <div class="d-icon">⚠️</div>
         <p class="d-title">هذا الطالب مسجّل مسبقاً!</p>
         <p class="d-info">تم تسجيل <strong>${dup.fname} ${dup.lname}</strong> مسبقاً في النظام.</p>
-        <p class="d-info" style="margin-top:6px;font-size:13px">تم التحقق من: الاسم، اسم الأب، اسم الأم، اسم الجد</p>
         <small>إذا كانت بياناتك تغيّرت، تواصل مع الآنسة بيداء الصفدي للتعديل</small>
       </div>`;
       return;
     }
-  }catch(e){ console.log('dup check skipped:', e.message); }
+  }catch(e){ console.log('Firestore dup check skipped (guest)'); }
   msg.innerHTML='<div class="loader">⏳ جارٍ الحفظ...</div>';
   try{
     await addDoc(collection(db,'students'),{
@@ -455,6 +465,8 @@ async function submitForm(){
     ['fname','lname','father','grandfather','mother','whatsapp','mobile','notes','city','street','addressDetail'].forEach(id=>document.getElementById(id).value='');
     ['country','province','grade'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('mobcode').value='+963'; updateFlag();
+    /* حفظ البصمة في localStorage لمنع التكرار لاحقاً */
+    localStorage.setItem(dupKey, '1');
     msg.innerHTML=`<div class="success"><div class="s-icon">✅</div><p>تم التسجيل بنجاح!</p><small>سيتواصل معك فريق مدرسة الشام الدولية الافتراضية قريباً</small></div>`;
     setTimeout(()=>msg.innerHTML='',6000);
   }catch(e){ msg.innerHTML=`<div class="err-box">خطأ في الحفظ: ${e.message}</div>`; }
