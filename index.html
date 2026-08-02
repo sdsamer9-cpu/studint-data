@@ -88,6 +88,20 @@ tr:hover td{background:#f5f3ff}
 .mob-flag-wrap select{width:100%;color:transparent;padding-right:10px}
 .mob-flag-overlay{position:absolute;right:10px;top:50%;transform:translateY(-50%);pointer-events:none;display:flex;align-items:center;gap:5px;z-index:2}
 .mob-flag-overlay span{font-size:14px;color:#1a1a1a;font-weight:500}
+.att-row{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid #f0f0ff;gap:10px;flex-wrap:wrap}
+.att-row:last-child{border-bottom:none}
+.att-row:hover{background:#f9f8ff}
+.att-name{font-size:14px;font-weight:600;color:#1a1a1a;flex:1}
+.att-grade{font-size:11px;color:#6366f1;background:#ede9fe;padding:2px 8px;border-radius:10px;font-weight:700;white-space:nowrap}
+.att-btns{display:flex;gap:6px}
+.att-btn{border:none;border-radius:8px;padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:opacity 0.15s}
+.att-btn.present{background:#dcfce7;color:#166534}
+.att-btn.present.active{background:#16a34a;color:#fff;box-shadow:0 2px 8px rgba(22,163,74,0.4)}
+.att-btn.absent{background:#fee2e2;color:#991b1b}
+.att-btn.absent.active{background:#dc2626;color:#fff;box-shadow:0 2px 8px rgba(220,38,38,0.4)}
+.att-filter{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.att-filter input{flex:1;min-width:150px}
+.att-filter select{width:180px}
 @media(max-width:500px){.g2{grid-template-columns:1fr}.pw select{width:110px}}
 </style>
 </head>
@@ -107,7 +121,7 @@ tr:hover td{background:#f5f3ff}
 
   <!-- Admin bar -->
   <div id="adminBar" class="admin-bar hidden">
-    <span>✅ آدمن: <strong id="adminEmailTxt"></strong></span>
+    <span><strong id="adminRoleTxt"></strong> — <span id="adminEmailTxt"></span></span>
     <button class="btn btn-red" id="logoutBtn">تسجيل خروج</button>
   </div>
 
@@ -120,6 +134,23 @@ tr:hover td{background:#f5f3ff}
     </div>
     <button class="btn" id="loginBtn">🔑 تسجيل الدخول</button>
     <div id="loginErr"></div>
+  </div>
+
+  <!-- User Panel: عرض الطلاب + حضور/غياب -->
+  <div id="userPanel" class="hidden">
+    <div class="card">
+      <p class="sec">📋 قائمة الطلاب — تسجيل الحضور والغياب</p>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-n" id="uTotalCount">—</div><div class="stat-l">إجمالي الطلاب</div></div>
+        <div class="stat"><div class="stat-n" id="uPresentCount" style="color:#059669">—</div><div class="stat-l">حاضر اليوم</div></div>
+      </div>
+      <div class="btn-row" style="margin-bottom:10px">
+        <button class="btn btn-green" id="saveAttendanceBtn">💾 حفظ الحضور</button>
+        <button class="btn btn-outline" id="refreshAttendanceBtn">🔄 تحديث</button>
+      </div>
+      <div id="attendanceDate" style="text-align:center;font-size:13px;color:#6366f1;font-weight:700;margin-bottom:10px"></div>
+      <div id="attendanceArea"><div class="loader">⏳ جارٍ التحميل...</div></div>
+    </div>
   </div>
 
   <!-- Form -->
@@ -172,6 +203,22 @@ tr:hover td{background:#f5f3ff}
       </div>
       <div class="g1">
         <div class="f"><label>تفاصيل إضافية</label><input type="text" id="addressDetail" placeholder="مثال: بناء رقم 5، طابق 3..."></div>
+      </div>
+      <!-- حقول المستلم داخل سوريا (تظهر فقط عند اختيار سوريا) -->
+      <div id="syriaReceiverBox" style="display:none;margin-top:4px">
+        <div style="background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1.5px solid #f59e0b;border-radius:12px;padding:14px 16px;margin-bottom:4px">
+          <p style="font-size:13px;font-weight:700;color:#92400e;margin-bottom:12px">📦 بيانات المستلم داخل سوريا (لتسليم الكتب)</p>
+          <div class="g2">
+            <div class="f">
+              <label>الاسم الثلاثي للمستلم <span class="req">*</span></label>
+              <input type="text" id="receiverName" placeholder="مثال: أحمد محمد العلي">
+            </div>
+            <div class="f">
+              <label>رقم موبايل المستلم <span class="req">*</span></label>
+              <input type="tel" id="receiverMobile" placeholder="مثال: 0991234567" style="direction:ltr;text-align:right">
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -256,7 +303,8 @@ const cfg = {
   messagingSenderId:"839161017280",
   appId:"1:839161017280:web:ac1a3d6e3770d1a94b4e25"
 };
-const ADMIN = 'sdsamer@gmail.com';
+const ADMINS = ['sdsamer@gmail.com','alnajemamal288@gmail.com'];
+const ADMIN = ADMINS[0]; // للتوافق مع الكود القديم
 const app  = initializeApp(cfg);
 const auth = getAuth(app);
 const db   = getFirestore(app);
@@ -292,6 +340,14 @@ function updateProvinces(){
   const sel = document.getElementById('province');
   sel.innerHTML = '<option value="">— اختر المحافظة —</option>';
   (provinces[c]||[]).forEach(p=>{ const o=document.createElement('option');o.value=p;o.textContent=p;sel.appendChild(o); });
+  /* إظهار حقول المستلم فقط لسوريا */
+  const syrBox = document.getElementById('syriaReceiverBox');
+  if(syrBox) syrBox.style.display = (c==='syria') ? 'block' : 'none';
+  /* تفريغ الحقول عند تغيير الدولة */
+  if(c !== 'syria'){
+    document.getElementById('receiverName').value = '';
+    document.getElementById('receiverMobile').value = '';
+  }
 }
 
 /* ===== تسجيل الدخول ===== */
@@ -300,7 +356,7 @@ async function doLogin(){
   const pass  = document.getElementById('adminPass').value;
   const err   = document.getElementById('loginErr');
   err.innerHTML = '';
-  if(email !== ADMIN){ err.innerHTML='<div class="err-box">هذا الحساب ليس لديه صلاحية الآدمن</div>'; return; }
+  if(!ADMINS.includes(email)){ err.innerHTML='<div class="err-box">هذا الحساب ليس لديه صلاحية الآدمن</div>'; return; }
   try{ await signInWithEmailAndPassword(auth,email,pass); }
   catch(e){ err.innerHTML='<div class="err-box">بيانات الدخول غير صحيحة</div>'; }
 }
@@ -384,7 +440,7 @@ function exportExcel(){
     'اسم الطالب':r.fname||'','الكنية':r.lname||'','اسم الأب':r.father||'','اسم الجد':r.grandfather||'',
     'اسم الأم':r.mother||'','الصف':r.grade||'','الدولة':r.country||'','المحافظة':r.province||'',
     'المدينة':r.city||'','الشارع':r.street||'','تفاصيل العنوان':r.addressDetail||'',
-    'الواتساب':r.whatsapp||'','الموبايل':r.mobile||'','ملاحظات':r.notes||''
+    'الواتساب':r.whatsapp||'','الموبايل':r.mobile||'','اسم المستلم (سوريا)':r.receiverName||'','موبايل المستلم (سوريا)':r.receiverMobile||'','ملاحظات':r.notes||''
   }));
   const ws=XLSX.utils.json_to_sheet(rows);
   ws['!cols']=Object.keys(rows[0]).map(()=>({wch:20}));
@@ -395,11 +451,13 @@ function exportExcel(){
 
 /* ===== تسجيل طالب ===== */
 async function submitForm(){
+  const isSyria = document.getElementById('country').value === 'syria';
   const req=[
     {id:'fname',l:'اسم الطالب'},{id:'lname',l:'الكنية'},{id:'father',l:'اسم الأب'},
     {id:'grandfather',l:'اسم الجد'},{id:'mother',l:'اسم الأم'},{id:'grade',l:'الصف'},
     {id:'country',l:'الدولة'},{id:'province',l:'المحافظة'},{id:'city',l:'المدينة'},
-    {id:'whatsapp',l:'رقم الواتساب'},{id:'mobile',l:'رقم الموبايل'}
+    {id:'whatsapp',l:'رقم الواتساب'},{id:'mobile',l:'رقم الموبايل'},
+    ...(isSyria ? [{id:'receiverName',l:'الاسم الثلاثي للمستلم'},{id:'receiverMobile',l:'رقم موبايل المستلم'}] : [])
   ];
   const miss = req.filter(f=>!document.getElementById(f.id).value.trim()).map(f=>f.l);
   if(miss.length){ alert('يرجى تعبئة:\n'+miss.join('، ')); return; }
@@ -460,9 +518,11 @@ async function submitForm(){
       whatsapp:document.getElementById('whatsapp').value.trim(),
       mobile:document.getElementById('mobcode').value+document.getElementById('mobile').value.trim(),
       notes:document.getElementById('notes').value.trim(),
+      receiverName:   isSyria ? document.getElementById('receiverName').value.trim()   : '',
+      receiverMobile: isSyria ? document.getElementById('receiverMobile').value.trim() : '',
       createdAt:Timestamp.now()
     });
-    ['fname','lname','father','grandfather','mother','whatsapp','mobile','notes','city','street','addressDetail'].forEach(id=>document.getElementById(id).value='');
+    ['fname','lname','father','grandfather','mother','whatsapp','mobile','notes','city','street','addressDetail','receiverName','receiverMobile'].forEach(id=>document.getElementById(id).value='');
     ['country','province','grade'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('mobcode').value='+963'; updateFlag();
     /* حفظ البصمة في localStorage لمنع التكرار لاحقاً */
@@ -473,14 +533,131 @@ async function submitForm(){
 }
 
 /* ===== Auth State ===== */
+/* ===== نظام الصلاحيات ===== */
+// ADMINS   : إضافة / حذف / تصدير Excel
+// USER     : عرض الأسماء + تسجيل حضور/غياب
+// GUEST    : تسجيل طالب جديد فقط
+
 onAuthStateChanged(auth, user=>{
-  const isAdmin = user && user.email===ADMIN;
+  const isAdmin  = user && ADMINS.includes(user.email);
+  const isUser   = user && !isAdmin;
+  const isGuest  = !user;
+
+  /* إخفاء/إظهار العناصر */
   document.getElementById('loginBox').classList.add('hidden');
-  document.getElementById('adminBar').classList.toggle('hidden',!isAdmin);
-  document.getElementById('adminPanel').classList.toggle('hidden',!isAdmin);
-  document.getElementById('toggleWrap').style.display = isAdmin?'none':'block';
-  if(isAdmin){ document.getElementById('adminEmailTxt').textContent=user.email; loadRecords(); }
+  document.getElementById('adminBar').classList.toggle('hidden', !user);
+  document.getElementById('adminPanel').classList.toggle('hidden', !isAdmin);
+  document.getElementById('userPanel').classList.toggle('hidden', !isUser);
+  document.getElementById('toggleWrap').style.display = user ? 'none' : 'block';
+  document.getElementById('regForm').style.display = isUser ? 'none' : 'block';
+
+  if(user){
+    document.getElementById('adminEmailTxt').textContent = user.email;
+    const role = isAdmin ? '🛡️ مدير' : '👤 مستخدم';
+    document.getElementById('adminRoleTxt').textContent = role;
+    if(isAdmin) loadRecords();
+    if(isUser)  loadStudentsForAttendance();
+  }
 });
+
+/* ===== لوحة المستخدم: حضور وغياب ===== */
+let attendanceData = {}; // {studentId: 'present'|'absent'}
+let studentsForAtt = [];
+
+async function loadStudentsForAttendance(){
+  const area = document.getElementById('attendanceArea');
+  area.innerHTML = '<div class="loader">⏳ جارٍ تحميل الطلاب...</div>';
+  const today = new Date().toLocaleDateString('ar-EG',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('attendanceDate').textContent = '📅 ' + today;
+  try{
+    const snap = await getDocs(query(collection(db,'students'),orderBy('createdAt','desc')));
+    studentsForAtt = [];
+    snap.forEach(d=>studentsForAtt.push({id:d.id,...d.data()}));
+    document.getElementById('uTotalCount').textContent = studentsForAtt.length;
+    renderAttendance(studentsForAtt);
+  }catch(e){ area.innerHTML=`<div class="err-box">خطأ: ${e.message}</div>`; }
+}
+
+function renderAttendance(list){
+  const area = document.getElementById('attendanceArea');
+  if(!list.length){ area.innerHTML='<div class="loader">لا توجد طلاب</div>'; return; }
+  let html2 = `<div class="att-filter">
+    <input type="text" id="attSearch" placeholder="🔍 بحث باسم الطالب..." style="padding:8px 12px;border:1.5px solid #c7d2fe;border-radius:9px;font-size:13px;direction:rtl">
+    <select id="attGradeFilter" style="padding:8px 12px;border:1.5px solid #c7d2fe;border-radius:9px;font-size:13px;direction:rtl">
+      <option value="">— كل الصفوف —</option>
+      ${[...new Set(studentsForAtt.map(s=>s.grade).filter(Boolean))].sort().map(g=>`<option value="${g}">${g}</option>`).join('')}
+    </select>
+  </div>
+  <div id="attList">`;
+  list.forEach((s,i)=>{
+    const st = attendanceData[s.id] || '';
+    html2 += `<div class="att-row">
+      <div>
+        <div class="att-name">${i+1}. ${s.fname||''} ${s.lname||''}</div>
+        <div style="font-size:12px;color:#888;margin-top:2px">${s.father||''} — ${s.country||''} ${s.province||''}</div>
+      </div>
+      <span class="att-grade">${s.grade||''}</span>
+      <div class="att-btns">
+        <button class="att-btn present${st==='present'?' active':''}" data-id="${s.id}" data-val="present">✅ حاضر</button>
+        <button class="att-btn absent${st==='absent'?' active':''}" data-id="${s.id}" data-val="absent">❌ غائب</button>
+      </div>
+    </div>`;
+  });
+  html2 += '</div>';
+  area.innerHTML = html2;
+  updatePresentCount();
+  /* أحداث أزرار الحضور */
+  area.querySelectorAll('.att-btn').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id = btn.dataset.id;
+      const val = btn.dataset.val;
+      attendanceData[id] = val;
+      /* تحديث مظهر الزرين */
+      const row = btn.closest('.att-row');
+      row.querySelectorAll('.att-btn').forEach(b=>{
+        b.classList.toggle('active', b.dataset.val===val);
+      });
+      updatePresentCount();
+    });
+  });
+  /* بحث وفلترة */
+  document.getElementById('attSearch').addEventListener('input', filterAttendance);
+  document.getElementById('attGradeFilter').addEventListener('change', filterAttendance);
+}
+
+function filterAttendance(){
+  const search = document.getElementById('attSearch').value.toLowerCase();
+  const grade  = document.getElementById('attGradeFilter').value;
+  const filtered = studentsForAtt.filter(s=>{
+    const name = ((s.fname||'')+' '+(s.lname||'')).toLowerCase();
+    return (!search || name.includes(search)) && (!grade || s.grade===grade);
+  });
+  renderAttendance(filtered);
+}
+
+function updatePresentCount(){
+  const n = Object.values(attendanceData).filter(v=>v==='present').length;
+  document.getElementById('uPresentCount').textContent = n;
+}
+
+async function saveAttendance(){
+  const total = studentsForAtt.length;
+  const marked = Object.keys(attendanceData).length;
+  if(marked === 0){ alert('لم تسجّل أي حضور أو غياب بعد!'); return; }
+  const today = new Date().toISOString().slice(0,10);
+  const present = Object.entries(attendanceData).filter(([,v])=>v==='present').length;
+  const absent  = Object.entries(attendanceData).filter(([,v])=>v==='absent').length;
+  try{
+    await addDoc(collection(db,'attendance'),{
+      date: today,
+      data: attendanceData,
+      present, absent, total,
+      recordedBy: auth.currentUser?.email || '',
+      createdAt: Timestamp.now()
+    });
+    alert(`✅ تم حفظ الحضور بنجاح!\nحاضر: ${present} | غائب: ${absent} | إجمالي: ${total}`);
+  }catch(e){ alert('خطأ في الحفظ: '+e.message); }
+}
 
 /* ===== ربط الأحداث ===== */
 document.getElementById('toggleAdminBtn').addEventListener('click',()=>document.getElementById('loginBox').classList.toggle('hidden'));
@@ -491,6 +668,8 @@ document.getElementById('submitBtn').addEventListener('click', submitForm);
 document.getElementById('exportBtn').addEventListener('click', exportExcel);
 document.getElementById('refreshBtn').addEventListener('click', loadRecords);
 document.getElementById('country').addEventListener('change', updateProvinces);
+document.getElementById('saveAttendanceBtn').addEventListener('click', saveAttendance);
+document.getElementById('refreshAttendanceBtn').addEventListener('click', ()=>{ attendanceData={}; loadStudentsForAttendance(); });
 document.getElementById('mobcode').addEventListener('change', updateFlag);
 document.getElementById('delSelBtn').addEventListener('click', deleteSelected);
 document.getElementById('clearSelBtn').addEventListener('click',()=>{
